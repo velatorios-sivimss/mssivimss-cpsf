@@ -11,6 +11,8 @@ import lombok.Setter;
 public class UsuarioDto {
 
 	private Integer idVelatorio;
+	
+	private Integer idPersona;
 
 	private Integer idRol;
 
@@ -29,5 +31,11 @@ public class UsuarioDto {
 	private String cveMatricula;
 	
 	private String cveUsuario;
+	
+	private String contrasenia;
+	
+	private Integer indActivo;
+	
+	private Integer indContratante;
 	
 }

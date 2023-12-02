@@ -53,6 +53,26 @@ public class ProviderServiceRestTemplate {
 			throw exception;
 		}
 	}
+	
+	public Response<Object> consumirServicio(Object dato, String url) throws IOException {
+		Response<Object> respuestaGenerado=restTemplateUtil.sendPostRequestByteArrayToken(url, dato,jwtTokenProvider.createToken(""), Response.class);
+		return validarResponse(respuestaGenerado);
+	}
+	
+	public Response<Object> validarResponse(Response<?> respuestaGenerado) {
+		String codigo = respuestaGenerado.getMensaje().substring(0, 3);
+		if (codigo.equals("500") || codigo.equals("404") || codigo.equals("400") || codigo.equals("403")) {
+			Gson gson = new Gson();
+			String mensaje = respuestaGenerado.getMensaje().substring(7, respuestaGenerado.getMensaje().length() - 1);
+
+			ErrorsMessageResponse apiExceptionResponse = gson.fromJson(mensaje, ErrorsMessageResponse.class);
+
+			respuestaGenerado = Response.builder().codigo((int) apiExceptionResponse.getCodigo()).error(true)
+					.mensaje(apiExceptionResponse.getMensaje()).datos(apiExceptionResponse.getDatos()).build();
+
+		}
+		return (Response<Object>) respuestaGenerado;
+	}
 
 	
 

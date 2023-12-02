@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.loader.plan.exec.process.internal.AbstractRowReader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,10 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class RestTemplateUtil {
 
 	private final RestTemplate restTemplate;
@@ -53,11 +49,6 @@ public class RestTemplateUtil {
 		} catch (IOException ioException) {
 			throw ioException;
 		} catch (Exception e) {
-			/*
-			 * log.error("Fallo al consumir el servicio, {}", e.getMessage());
-			 * responseBody.setCodigo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			 * responseBody.setError(true); responseBody.setMensaje(e.getMessage());
-			 */
 			throw e;
 		}
 
@@ -119,6 +110,24 @@ public class RestTemplateUtil {
 		}
 
 		return responseBody;
+	}
+	
+	/**
+	 * Env&iacute;a una petici&oacute;n con Body y token.
+	 *
+	 * @param url
+	 * @param clazz
+	 * @return
+	 */
+	public Response<Object> sendPostRequestByteArrayToken(String url, Object body, String subject,
+			Class<?> clazz) {
+		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
+
+		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+
+		 ResponseEntity<Object> responseEntity = (ResponseEntity<Object>) restTemplate.postForEntity(url, request, clazz);
+
+		return (Response<Object>) responseEntity.getBody();
 	}
 
 	/**

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.cpsf.configuration.mapper.Consultas;
 import com.imss.sivimss.cpsf.configuration.mapper.PersonaMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.PlanSFPAMapper;
 
 @Service
 public class MyBatisConfig {
@@ -40,7 +41,7 @@ public class MyBatisConfig {
 	    Configuration configuration = new Configuration(environment);
 	    configuration.addMapper(Consultas.class);
 	    configuration.addMapper(PersonaMapper.class);
-
+	    configuration.addMapper(PlanSFPAMapper.class);
 	    
 	    SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
 	    

@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 import com.imss.sivimss.cpsf.utils.NoRedirectSimpleClientHttpRequestFactory;
@@ -29,5 +31,10 @@ public class CpsfApplication {
 	@Bean
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
+	}
+	
+	@Bean
+	public PasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
 	}
 }
