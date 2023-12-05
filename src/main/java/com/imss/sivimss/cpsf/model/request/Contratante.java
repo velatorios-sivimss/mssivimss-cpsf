@@ -13,6 +13,10 @@ public class Contratante extends PersonaPlanSFPA{
 	
 	private Integer idTitularBeneficiarios;
 	
+	private Integer idBeneficiario1;
+	
+	private Integer idBeneficiario2;
+	
 	private String matricula;
 
 	private Domicilio cp;

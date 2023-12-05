@@ -1,5 +1,8 @@
 package com.imss.sivimss.cpsf.service;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.springframework.security.core.Authentication;
 
 import com.imss.sivimss.cpsf.model.request.Contratante;
@@ -29,5 +32,7 @@ public interface PlanSFPAService {
 	Response<Object> consultaPlanSFPA(Integer idPlanSfpa);
 	
 	Response<Object> generaReporteConvenioPagoAnticipado(Integer idPlanSfpa, Authentication authentication);
+	
+	Response<Object>  verDetallePlanSfpa(Integer idPlanSfpa) throws IOException, SQLException;
 
 }

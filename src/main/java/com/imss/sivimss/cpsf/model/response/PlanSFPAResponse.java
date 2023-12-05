@@ -1,8 +1,9 @@
-package com.imss.sivimss.cpsf.model.request;
+package com.imss.sivimss.cpsf.model.response;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.imss.sivimss.cpsf.model.request.Contratante;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,28 +11,24 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PlanSFPA {
+public class PlanSFPAResponse {
 	
 	private Integer idPlanSfpa;
-	private String numFolioPlanSfpa;
+	private String numFolioPlanSFPA;
 	private Integer idTipoContratacion;
 	private Integer idPaquete;
-	private Double monPrecio;
 	private Integer idTipoPagoMensual;
-	private Integer numPagoMensual;
 	private Integer indTitularSubstituto;
 	private Integer indModificarTitularSubstituto;
 	private Integer indPromotor;
 	private Integer idPromotor;
 	private Integer idVelatorio;
-	private Integer idEstatusPlanSfpa = 8;
+	private String desIdVelatorio;
+	private Integer idEstatusPlanSfpa;
 	private Integer indActivo;
 	private Boolean indTipoPagoMensual;
+	private String fecIngreso;
+	private Integer numPago;
 	private List<Contratante> titularesBeneficiarios;
-	private Integer idUsuario;
-	private Integer titular;
-	private Integer subtitular;
-	private Integer beneficiario1;
-	private Integer beneficiario2;
 
 }

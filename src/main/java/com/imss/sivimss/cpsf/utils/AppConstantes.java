@@ -1,6 +1,7 @@
 package com.imss.sivimss.cpsf.utils;
 
 public class AppConstantes {
+	
 	public static final String CONSULTA = "0";
 	
 	public static final String NUMERO_DE_PAGINA = "0";
@@ -10,6 +11,9 @@ public class AppConstantes {
 	public static final String DATOS = "datos";
 	
 	public static final String TITULAR = "titular";
+	public static final String TITULAR_SUBSTITUTO = "titular substituto";
+	public static final String BENEFICIARIO_1 = "beneficiario 1";
+	public static final String BENEFICIARIO_2 = "beneficiario 2";	
 	
 	public static final String AGREGADO_CORRECTAMENTE= "30"; 
 	public static final String RUTA_NOMBRE_REPORTE = "rutaNombreReporte";

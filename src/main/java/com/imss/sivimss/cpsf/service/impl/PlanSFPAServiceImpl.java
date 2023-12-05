@@ -1,6 +1,7 @@
 package com.imss.sivimss.cpsf.service.impl;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import com.imss.sivimss.cpsf.model.request.PlanSFPA;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ContratanteResponse;
 import com.imss.sivimss.cpsf.model.response.PersonaResponse;
+import com.imss.sivimss.cpsf.model.response.PlanSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.ReportePagoAnticipadoReponse;
 import com.imss.sivimss.cpsf.service.PlanSFPAService;
 import com.imss.sivimss.cpsf.service.beans.BeanQuerys;
@@ -164,15 +166,18 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			try {
 				obtenerDetalle(planSFPARequest, user, planSFPAMapper);
 				
-				planSFPARequest.setIdTitular(planSFPARequest.getTitularesBeneficiarios().get(0).getIdContratante());
+				planSFPARequest.setTitular(planSFPARequest.getTitularesBeneficiarios().get(0).getIdContratante());
 				if(planSFPARequest.getTitularesBeneficiarios().size() == 2) {
-					planSFPARequest.setIdSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+					planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
 				}
 				if(planSFPARequest.getTitularesBeneficiarios().size() == 3) {
-					planSFPARequest.setIdBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdTitularBeneficiarios());
+					planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+					planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
 				}
 				if(planSFPARequest.getTitularesBeneficiarios().size() == 4) {
-					planSFPARequest.setIdBeneficiario2(planSFPARequest.getTitularesBeneficiarios().get(3).getIdTitularBeneficiarios());	
+					planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+					planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
+					planSFPARequest.setBeneficiario2(planSFPARequest.getTitularesBeneficiarios().get(3).getIdBeneficiario2());	
 				}
 				
 				planSFPARequest.setNumFolioPlanSfpa(planSFPAMapper.selectnumFolioPlanSfpa(user.getIdVelatorio(), planSFPARequest.getIdPaquete(), planSFPARequest.getIdTipoPagoMensual()));
@@ -196,9 +201,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				
 				String contrasenia= generaCredenciales.generarContrasenia(contratante.getNomPersona() , contratante.getNomApellidoPaterno());
 				String usuario = generaCredenciales.insertarUser(contratante.getIdTitular(),contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contrasenia, contratante.getIdPersona(), user.getIdUsuario(), planSFPAMapper);
-//				resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia);
-				
-				resp =  new Response<>(false, 200, "EXITO", "[]");
+     			resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia);
 				if (resp.getCodigo() == 200) {
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
@@ -252,11 +255,29 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				} else {
 					planSFPAMapper.insertarDomicilio(persona.getCp());
 				}
-				if(personaTemp != null && personaTemp.getIdTitularBeneficiarios() != null) {
-					persona.setIdTitularBeneficiarios(personaTemp.getIdTitularBeneficiarios());
-					planSFPAMapper.actualizarTitularBeneficiarios(persona);
-				} else {
-					planSFPAMapper.insertarTitularBeneficiarios(persona);
+				if (persona.getPersona().equalsIgnoreCase(AppConstantes.TITULAR_SUBSTITUTO)) {
+					if(personaTemp != null && personaTemp.getIdTitularBeneficiarios() != null ) {
+						persona.setIdTitularBeneficiarios(personaTemp.getIdTitularBeneficiarios());
+						planSFPAMapper.actualizarTitularBeneficiarios(persona);
+					} else {
+						planSFPAMapper.insertarTitularBeneficiarios(persona);
+					}
+				}
+				if (persona.getPersona().equalsIgnoreCase(AppConstantes.BENEFICIARIO_1)) {
+					if(personaTemp != null && personaTemp.getIdTitularBeneficiarios() != null ) {
+						persona.setIdBeneficiario1(personaTemp.getIdTitularBeneficiarios());
+						planSFPAMapper.actualizarTitularBeneficiarios(persona);
+					} else {
+						planSFPAMapper.insertarTitularBeneficiario1(persona);
+					}
+				}
+				if (persona.getPersona().equalsIgnoreCase(AppConstantes.BENEFICIARIO_2)) {
+					if(personaTemp != null && personaTemp.getIdTitularBeneficiarios() != null) {
+						persona.setIdBeneficiario2(personaTemp.getIdTitularBeneficiarios());
+						planSFPAMapper.actualizarTitularBeneficiarios(persona);
+					} else {
+						planSFPAMapper.insertarTitularBeneficiario2(persona);
+					}
 				}
 			}
 		}
@@ -380,5 +401,20 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		envioDatos.put(AppConstantes.TIPO_REPORTE, "pdf");
 		envioDatos.put(AppConstantes.RUTA_NOMBRE_REPORTE, convenioPagoAnticipado);
 	return envioDatos;
+	}
+
+	@Override
+	public Response<Object> verDetallePlanSfpa(Integer idPlanSfpa) throws IOException, SQLException {
+		PlanSFPAResponse planSFPAResponse;
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
+		try(SqlSession session = sqlSessionFactory.openSession()) {
+			PlanSFPAMapper planSFPAMapper = session.getMapper(PlanSFPAMapper.class);
+			
+			planSFPAResponse = DatosRequestUtil.generarDetallePlan( planSFPAMapper.selectVerdetallePlanSFPA(idPlanSfpa));
+
+		}
+		
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, planSFPAResponse);
 	}
 }

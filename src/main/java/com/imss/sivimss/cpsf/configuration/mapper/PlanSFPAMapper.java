@@ -14,6 +14,7 @@ import com.imss.sivimss.cpsf.model.request.PagoSFPA;
 import com.imss.sivimss.cpsf.model.request.PlanSFPA;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ContratanteResponse;
+import com.imss.sivimss.cpsf.model.response.DetallePlanSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.PersonaResponse;
 import com.imss.sivimss.cpsf.model.response.ReportePagoAnticipadoReponse;
 
@@ -64,6 +65,16 @@ public interface PlanSFPAMapper {
 	@Options(useGeneratedKeys = true,keyProperty = "titularBeneficiarios.idTitularBeneficiarios", keyColumn="ID_TITULAR_BENEFICIARIOS")
 	public int insertarTitularBeneficiarios(@Param("titularBeneficiarios")Contratante Contratante);
 	
+	@Insert(value = "INSERT INTO SVT_TITULAR_BENEFICIARIOS (ID_PERSONA, CVE_MATRICULA, REF_PERSONA, ID_DOMICILIO, ID_USUARIO_ALTA) "
+			+ "VALUES (#{titularBeneficiarios.idPersona},#{titularBeneficiarios.matricula},#{titularBeneficiarios.persona},#{titularBeneficiarios.cp.idDomicilio},#{titularBeneficiarios.idUsuario})")
+	@Options(useGeneratedKeys = true,keyProperty = "titularBeneficiarios.idBeneficiario1", keyColumn="ID_TITULAR_BENEFICIARIOS")
+	public int insertarTitularBeneficiario1(@Param("titularBeneficiarios")Contratante Contratante);
+	
+	@Insert(value = "INSERT INTO SVT_TITULAR_BENEFICIARIOS (ID_PERSONA, CVE_MATRICULA, REF_PERSONA, ID_DOMICILIO, ID_USUARIO_ALTA) "
+			+ "VALUES (#{titularBeneficiarios.idPersona},#{titularBeneficiarios.matricula},#{titularBeneficiarios.persona},#{titularBeneficiarios.cp.idDomicilio},#{titularBeneficiarios.idUsuario})")
+	@Options(useGeneratedKeys = true,keyProperty = "titularBeneficiarios.idBeneficiario2", keyColumn="ID_TITULAR_BENEFICIARIOS")
+	public int insertarTitularBeneficiario2(@Param("titularBeneficiarios")Contratante Contratante);
+	
 	@Update(value = "UPDATE SVT_TITULAR_BENEFICIARIOS SET ID_PERSONA = #{titularBeneficiarios.idPersona}, CVE_MATRICULA=#{titularBeneficiarios.matricula},  REF_PERSONA=#{titularBeneficiarios.persona}, "
 			+ " ID_DOMICILIO = #{titularBeneficiarios.cp.idDomicilio}, FEC_ACTUALIZACION=CURRENT_DATE(), ID_USUARIO_MODIFICA=#{titularBeneficiarios.idUsuario} WHERE ID_TITULAR_BENEFICIARIOS = #{titularBeneficiarios.idTitularBeneficiarios}")
 	public int actualizarTitularBeneficiarios(@Param("titularBeneficiarios")Contratante Contratante);
@@ -75,8 +86,8 @@ public interface PlanSFPAMapper {
 	
 	@Insert(value = "INSERT INTO SVT_PLAN_SFPA (NUM_FOLIO_PLAN_SFPA, ID_TIPO_CONTRATACION, ID_TITULAR, ID_PAQUETE, IMP_PRECIO, ID_TIPO_PAGO_MENSUAL, IND_TITULAR_SUBSTITUTO, IND_MODIF_TITULAR_SUB, "
 			+ "ID_TITULAR_SUBSTITUTO, ID_BENEFICIARIO_1, ID_BENEFICIARIO_2, IND_PROMOTOR, ID_PROMOTOR, ID_VELATORIO, ID_ESTATUS_PLAN_SFPA, ID_USUARIO_ALTA) "
-			+ "VALUES (#{plansfpa.numFolioPlanSfpa},#{plansfpa.idTipoContratacion},#{plansfpa.idTitular},#{plansfpa.idPaquete},#{plansfpa.monPrecio},#{plansfpa.idTipoPagoMensual},#{plansfpa.indTitularSubstituto},"
-			+ "#{plansfpa.indModificarTitularSubstituto},#{plansfpa.idSubtitular},#{plansfpa.idBeneficiario1},#{plansfpa.idBeneficiario2},#{plansfpa.indPromotor},#{plansfpa.idPromotor},#{plansfpa.idVelatorio},#{plansfpa.idEstatusPlanSfpa},#{plansfpa.idUsuario})")
+			+ "VALUES (#{plansfpa.numFolioPlanSfpa},#{plansfpa.idTipoContratacion},#{plansfpa.titular},#{plansfpa.idPaquete},#{plansfpa.monPrecio},#{plansfpa.idTipoPagoMensual},#{plansfpa.indTitularSubstituto},"
+			+ "0,#{plansfpa.subtitular},#{plansfpa.beneficiario1},#{plansfpa.beneficiario2},#{plansfpa.indPromotor},#{plansfpa.idPromotor},#{plansfpa.idVelatorio},#{plansfpa.idEstatusPlanSfpa},#{plansfpa.idUsuario})")
 	@Options(useGeneratedKeys = true,keyProperty = "plansfpa.idPlanSfpa", keyColumn="ID_PLAN_SFPA")
 	public int insertarPlanSfpa(@Param("plansfpa")PlanSFPA planSFPARequest);
 	
@@ -107,6 +118,27 @@ public interface PlanSFPAMapper {
 			+ "SVT_TITULAR_BENEFICIARIOS TBSP2 ON TBSP2.ID_TITULAR_BENEFICIARIOS  = PSFPA.ID_BENEFICIARIO_1  LEFT JOIN SVC_PERSONA P3 ON P3.ID_PERSONA = TBSP2.ID_PERSONA  LEFT JOIN SVT_DOMICILIO DO3 ON DO3.ID_DOMICILIO = TBSP2.ID_DOMICILIO  LEFT JOIN SVT_TITULAR_BENEFICIARIOS TBSP3 ON TBSP3.ID_TITULAR_BENEFICIARIOS  = PSFPA.ID_BENEFICIARIO_2  "
 			+ "LEFT JOIN SVC_PERSONA P4 ON P4.ID_PERSONA = TBSP3.ID_PERSONA  LEFT JOIN SVT_DOMICILIO DO4 ON DO4.ID_DOMICILIO = TBSP3.ID_DOMICILIO WHERE PSFPA.ID_PLAN_SFPA = #{idPlanSfpa}")
 	public ReportePagoAnticipadoReponse generaReporte(Integer idPlanSfpa);
+	
+	
+	@Select("SELECT SPSFPA.ID_PLAN_SFPA as idPlanSfpa, SPSFPA.NUM_FOLIO_PLAN_SFPA as numFolioPlanSfpa, SPSFPA.ID_TIPO_CONTRATACION as idTipoContratacion, SPSFPA.ID_PAQUETE as idPaquete, SPSFPA.ID_TIPO_PAGO_MENSUAL as idTipoPagoMensual, SPSFPA.IND_TITULAR_SUBSTITUTO as indTitularSubstituto, "
+			+ "SPSFPA.IND_MODIF_TITULAR_SUB as indModificarTitularSubstituto, SPSFPA.ID_PROMOTOR as idPromotor, SPSFPA.IND_PROMOTOR as indPromotor, SPSFPA.IND_ACTIVO as indActivo, SPSFPA.ID_VELATORIO as idVelatorio, SV.DES_VELATORIO as desIdVelatorio, SP.ID_PERSONA as idPersona, SP.CVE_RFC as rfc, SP.CVE_CURP as curp, "
+			+ "SC.CVE_MATRICULA as matricula, SP.CVE_NSS as nss, SP.NOM_PERSONA as nomPersona, SP.NOM_PRIMER_APELLIDO as primerApellido, SP.NOM_SEGUNDO_APELLIDO as segundoApellido, SP.NUM_SEXO as sexo, SP.REF_OTRO_SEXO as otroSexo, SP.FEC_NAC as fecNacimiento, SP.ID_PAIS as idPais, "
+			+ "SP.ID_ESTADO as idEstado, SP.REF_TELEFONO as telefono, SP.REF_TELEFONO_FIJO as telefonoFijo, SP.REF_CORREO as correo, SP.TIP_PERSONA as tipoPersona, SP.NUM_INE as ine, SD.ID_DOMICILIO as idDomicilio, SD.REF_CALLE as desCalle, SD.NUM_EXTERIOR as numExterior, SD.NUM_INTERIOR as numInterior, "
+			+ "SD.REF_CP as codigoPostal, SD.REF_COLONIA as desColonia, SD.REF_MUNICIPIO as desMunicipio, SD.REF_ESTADO as desEstado, SV.DES_VELATORIO as desVelatorio, SP2.ID_PERSONA as idPersona2, SP2.CVE_RFC as rfc2, SP2.CVE_CURP as curp2, STB2.CVE_MATRICULA as matricula2, SP2.CVE_NSS as nss2, "
+			+ "SP2.NOM_PERSONA as nomPersona2, SP2.NOM_PRIMER_APELLIDO as primerApellido2, SP2.NOM_SEGUNDO_APELLIDO as segundoApellido2, SP2.NUM_SEXO as sexo2, SP2.REF_OTRO_SEXO as otroSexo2, SP2.FEC_NAC as fecNacimiento2, SP2.ID_PAIS as idPais2, SP2.ID_ESTADO as idEstado2, SP2.REF_TELEFONO as telefono2, "
+			+ "SP2.REF_TELEFONO_FIJO as telefonoFijo2, SP2.REF_CORREO as correo2, SP2.TIP_PERSONA as tipoPersona2, SP2.NUM_INE as ine2, SD2.ID_DOMICILIO as idDomicilio2, SD2.REF_CALLE as desCalle2, SD2.NUM_EXTERIOR as numExterior2, SD2.NUM_INTERIOR as numInterior2, SD2.REF_CP as codigoPostal2, "
+			+ "SD2.REF_COLONIA as desColonia2, SD2.REF_MUNICIPIO as desMunicipio2, SD2.REF_ESTADO as desEstado2, DATE_FORMAT(SPSFPA.FEC_INGRESO, '%d/%m/%Y') as fecIngreso, ( SELECT COUNT(*) FROM SVT_PAGO_SFPA PSFPA INNER JOIN SVT_PLAN_SFPA PLSFPA on PSFPA.ID_PLAN_SFPA = PLSFPA.ID_PLAN_SFPA AND "
+			+ "PSFPA.ID_ESTATUS_PAGO = 4 AND PLSFPA.ID_ESTATUS_PLAN_SFPA not in (6) AND PLSFPA.IND_ACTIVO = 1 WHERE PSFPA.ID_PLAN_SFPA = #{idPlanSfpa} AND PSFPA.IND_ACTIVO = 1) as numPago, SP3.ID_PERSONA as idPersona3, SP3.CVE_RFC as rfc3, SP3.CVE_CURP as curp3, STB3.CVE_MATRICULA as matricula3, "
+			+ "SP3.CVE_NSS as nss3, SP3.NOM_PERSONA as nomPersona3, SP3.NOM_PRIMER_APELLIDO as primerApellido3, SP3.NOM_SEGUNDO_APELLIDO as segundoApellido3, SP3.NUM_SEXO as sexo3, SP3.REF_OTRO_SEXO as otroSexo3, SP3.FEC_NAC as fecNacimiento3, SP3.ID_PAIS as idPais3, SP3.ID_ESTADO as idEstado3, "
+			+ "SP3.REF_TELEFONO as telefono3, SP3.REF_TELEFONO_FIJO as telefonoFijo3, SP3.REF_CORREO as correo3, SP3.TIP_PERSONA as tipoPersona3, SP3.NUM_INE as ine3, SD3.ID_DOMICILIO as idDomicilio3, SD3.REF_CALLE as desCalle3, SD3.NUM_EXTERIOR as numExterior3, SD3.NUM_INTERIOR as numInterior3, "
+			+ "SD3.REF_CP as codigoPostal3, SD3.REF_COLONIA as desColonia3, SD3.REF_MUNICIPIO as desMunicipio3, SD3.REF_ESTADO as desEstado3, SP4.ID_PERSONA as idPersona4, SP4.CVE_RFC as rfc4, SP4.CVE_CURP as curp4, STB4.CVE_MATRICULA as matricula4, SP4.CVE_NSS as nss4, SP4.NOM_PERSONA as nomPersona, "
+			+ "SP4.NOM_PRIMER_APELLIDO as primerApellido4, SP4.NOM_SEGUNDO_APELLIDO as segundoApellido4, SP4.NUM_SEXO as sexo4, SP4.REF_OTRO_SEXO as otroSexo4, SP4.FEC_NAC as fecNacimiento4, SP4.ID_PAIS as idPais4, SP4.ID_ESTADO as idEstado4, SP4.REF_TELEFONO as telefono4, SP4.REF_TELEFONO_FIJO as telefonoFijo4, "
+			+ "SP4.REF_CORREO as correo4, SP4.TIP_PERSONA as tipoPersona4, SP4.NUM_INE as ine4, SD4.ID_DOMICILIO as idDomicilio4, SD4.REF_CALLE as desCalle4, SD4.NUM_EXTERIOR as numExterior4, SD4.NUM_INTERIOR as numInterior4, SD4.REF_CP as codigoPostal4, SD4.REF_COLONIA as desColonia4, SD4.REF_MUNICIPIO as desMunicipio4, "
+			+ "SD4.REF_ESTADO as desEstado4 FROM SVT_PLAN_SFPA SPSFPA INNER JOIN SVC_CONTRATANTE SC on SC.ID_CONTRATANTE = SPSFPA.ID_TITULAR INNER JOIN SVC_PERSONA SP on SP.ID_PERSONA = SC.ID_PERSONA INNER JOIN SVT_DOMICILIO SD on SD.ID_DOMICILIO = SC.ID_DOMICILIO LEFT JOIN SVT_TITULAR_BENEFICIARIOS STB2 "
+			+ "on STB2.ID_TITULAR_BENEFICIARIOS = SPSFPA.ID_TITULAR_SUBSTITUTO LEFT JOIN SVC_PERSONA SP2 on SP2.ID_PERSONA = STB2.ID_PERSONA LEFT JOIN SVT_DOMICILIO SD2 on SD2.ID_DOMICILIO = STB2.ID_DOMICILIO LEFT JOIN SVT_TITULAR_BENEFICIARIOS STB3 on STB3.ID_TITULAR_BENEFICIARIOS = SPSFPA.ID_BENEFICIARIO_1 "
+			+ "LEFT JOIN SVC_PERSONA SP3 on SP3.ID_PERSONA = STB3.ID_PERSONA LEFT JOIN SVT_DOMICILIO SD3 on SD3.ID_DOMICILIO = STB3.ID_DOMICILIO LEFT JOIN SVT_TITULAR_BENEFICIARIOS STB4 on STB4.ID_TITULAR_BENEFICIARIOS = SPSFPA.ID_BENEFICIARIO_2 LEFT JOIN SVC_PERSONA SP4 on SP4.ID_PERSONA = STB4.ID_PERSONA "
+			+ "LEFT JOIN SVT_DOMICILIO SD4 on SD4.ID_DOMICILIO = STB4.ID_DOMICILIO INNER JOIN SVC_VELATORIO SV on SV.ID_VELATORIO = SPSFPA.ID_VELATORIO WHERE SPSFPA.ID_PLAN_SFPA = #{idPlanSfpa} AND SPSFPA.IND_ACTIVO = 1")
+	public DetallePlanSFPAResponse selectVerdetallePlanSFPA(Integer idPlanSfpa);
 	
 	@Select("SELECT TIP_PARAMETRO AS imgCheck FROM SVC_PARAMETRO_SISTEMA sps WHERE sps.ID_FUNCIONALIDAD = 25 AND sps.DES_PARAMETRO = 'IMAGEN_CHECK'")
 	public String getImagenCheck();

@@ -117,6 +117,15 @@ public class PlanSFPAController {
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@PostMapping("/ver-detalle-linea-plan-sfpa")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenericoInsert")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenericoInsert")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> verDetallePlanSfpa(@RequestBody PlanSFPA planSFPARequest , Authentication authentication)	throws Throwable {
+		Response<Object> response = planSFPAService.verDetallePlanSfpa(planSFPARequest.getIdPlanSfpa());
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 	/**
 	 * fallbacks generico
 	 * 

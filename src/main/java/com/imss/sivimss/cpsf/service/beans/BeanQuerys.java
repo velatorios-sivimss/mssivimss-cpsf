@@ -104,7 +104,7 @@ public class BeanQuerys {
 		.innerJoin("SVT_USUARIOS SU", "SU.ID_PERSONA = SP.ID_PERSONA").innerJoin(ConsultaConstantes.SVT_DOMICILIO_SD, "SD.ID_DOMICILIO = SC.ID_DOMICILIO")
 		.leftJoin("SVT_TITULAR_BENEFICIARIOS STB2", "STB2.ID_TITULAR_BENEFICIARIOS = SPSFPA.ID_TITULAR_SUBSTITUTO")
 		.leftJoin("SVC_PERSONA SP2", "SP2.ID_PERSONA = STB2.ID_PERSONA").leftJoin("SVT_DOMICILIO SD2", "SD2.ID_DOMICILIO = STB2.ID_DOMICILIO")
-		.innerJoin("SVC_VELATORIO SV", "SV.ID_VELATORIO = SPSFPA.ID_VELATORIO").where("SU.CVE_USUARIO = :cveUsuario").setParameter("cveUsuario", cveUsuario);
+		.innerJoin(ConsultaConstantes.SVC_VELATORIO_SV, "SV.ID_VELATORIO = SPSFPA.ID_VELATORIO").where("SU.CVE_USUARIO = :cveUsuario").setParameter("cveUsuario", cveUsuario);
 		return queryUtil.build();
 	}
 	
@@ -136,7 +136,7 @@ public class BeanQuerys {
 	
 	public String obtenerFolioPlanSFPA(PlanSFPA planSFPARequest, UsuarioDto usuarioDto) {
 		SelectQueryUtil velatorio = new SelectQueryUtil();
-		velatorio.select("SUBSTRING(UPPER(SV.DES_VELATORIO),1,3)").from("SVC_VELATORIO SV")
+		velatorio.select("SUBSTRING(UPPER(SV.DES_VELATORIO),1,3)").from(ConsultaConstantes.SVC_VELATORIO_SV)
 				.where("SV.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, usuarioDto.getIdVelatorio());
 		
 		SelectQueryUtil paquete = new SelectQueryUtil();
@@ -224,7 +224,7 @@ public class BeanQuerys {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DATE_FORMAT(PSFPA.FEC_PARCIALIDAD,'%d/%m/%Y') AS FEC_PARCIALIDAD", "DATE_FORMAT(PSFPA.FEC_ALTA, '%d/%m/%Y') as FEC_ALTA")
 		.from("SVT_PAGO_SFPA PSFPA").where("IFNULL(PSFPA.ID_PAGO_SFPA ,0) > 0").and("PSFPA.ID_ESTATUS_PAGO = 8")
-		.and("PSFPA.ID_PLAN_SFPA = :idPlanSfpa").setParameter("idPlanSfpa", idPlanSfpa).orderBy("PSFPA.ID_PAGO_SFPA  ASC LIMIT 1");
+		.and("PSFPA.ID_PLAN_SFPA = :idPlanSfpa").setParameter(ConsultaConstantes.ID_PLAN_SFPA, idPlanSfpa).orderBy("PSFPA.ID_PAGO_SFPA  ASC LIMIT 1");
 		return queryUtil.build();
 	}
 	
@@ -233,7 +233,7 @@ public class BeanQuerys {
 		queryUtil.select("SPSFPA.ID_TITULAR as idTitular",ConsultaConstantes.SP_ID_PERSONA_AS_ID_PERSONA,"IFNULL(SP.NOM_PERSONA, '') AS nomPersona","IFNULL(SP.NOM_PRIMER_APELLIDO, '') AS nomApellidoPaterno",
 		"IFNULL(SP.NOM_SEGUNDO_APELLIDO, '') AS nomApellidoMaterno","IFNULL(SP.REF_CORREO , '') AS correo").from(ConsultaConstantes.SVT_PLAN_SFPA_SPSFPA)
 		.innerJoin(ConsultaConstantes.SVC_CONTRATANTE_SC, "SC.ID_CONTRATANTE = SPSFPA.ID_TITULAR").innerJoin(ConsultaConstantes.SVC_PERSONA_SP, ConsultaConstantes.SP_ID_PERSONA_SC_ID_PERSONA)
-		.where("IFNULL(SPSFPA.ID_PLAN_SFPA ,0) > 0").and("SPSFPA.ID_PLAN_SFPA =:idPlanSfpa").setParameter("idPlanSfpa", idPlanSfpa);
+		.where("IFNULL(SPSFPA.ID_PLAN_SFPA ,0) > 0").and("SPSFPA.ID_PLAN_SFPA =:idPlanSfpa").setParameter(ConsultaConstantes.ID_PLAN_SFPA, idPlanSfpa);
 		return queryUtil.build();
 	}
 	
