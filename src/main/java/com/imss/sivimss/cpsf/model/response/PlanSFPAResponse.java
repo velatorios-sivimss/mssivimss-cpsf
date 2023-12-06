@@ -18,6 +18,7 @@ public class PlanSFPAResponse {
 	private Integer idTipoContratacion;
 	private Integer idPaquete;
 	private Integer idTipoPagoMensual;
+	private Integer desTipoPagoMensual;
 	private Integer indTitularSubstituto;
 	private Integer indModificarTitularSubstituto;
 	private Integer indPromotor;
@@ -25,6 +26,7 @@ public class PlanSFPAResponse {
 	private Integer idVelatorio;
 	private String desIdVelatorio;
 	private Integer idEstatusPlanSfpa;
+	private String desEstatusPlanSfpa;
 	private Integer indActivo;
 	private Boolean indTipoPagoMensual;
 	private String fecIngreso;

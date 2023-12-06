@@ -15,6 +15,7 @@ public class DetallePlanSFPAResponse extends DetalleExtPlanSFPAResponse{
 	private Integer idTipoContratacion;
 	private Integer idPaquete;
 	private Integer idTipoPagoMensual;
+	private Integer desTipoPagoMensual;
 	private Integer indTitularSubstituto;
 	private Integer indModificarTitularSubstituto;
 	private Integer idPromotor;
@@ -23,6 +24,8 @@ public class DetallePlanSFPAResponse extends DetalleExtPlanSFPAResponse{
 	private Integer indActivo;
 	private Integer idVelatorio;
 	private String desIdVelatorio;
+	private Integer idEstatusPlanSfpa;
+	private String desEstatusPlanSfpa;
 	private Integer numPago;
 	private Integer idPersona;
 	private String rfc;

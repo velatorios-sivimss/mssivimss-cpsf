@@ -60,6 +60,7 @@ public class DatosRequestUtil {
 		planSFPAResponse.setIdTipoContratacion(detallePlanSFPA.getIdTipoContratacion());
 		planSFPAResponse.setIdPaquete(detallePlanSFPA.getIdPaquete());
 		planSFPAResponse.setIdTipoPagoMensual(detallePlanSFPA.getIdTipoPagoMensual());
+		planSFPAResponse.setDesTipoPagoMensual(detallePlanSFPA.getDesTipoPagoMensual());
 		planSFPAResponse.setIndTitularSubstituto(detallePlanSFPA.getIndTitularSubstituto());
 		planSFPAResponse.setIndModificarTitularSubstituto(detallePlanSFPA.getIndModificarTitularSubstituto());
 		planSFPAResponse.setIndTipoPagoMensual(detallePlanSFPA.getNumPago()== 0?false:true);
@@ -69,6 +70,8 @@ public class DatosRequestUtil {
 		planSFPAResponse.setIdVelatorio(detallePlanSFPA.getIdVelatorio());
 		planSFPAResponse.setDesIdVelatorio(detallePlanSFPA.getDesVelatorio());
 		planSFPAResponse.setFecIngreso(detallePlanSFPA.getFecIngreso());
+		planSFPAResponse.setIdEstatusPlanSfpa(detallePlanSFPA.getIdEstatusPlanSfpa());
+		planSFPAResponse.setDesEstatusPlanSfpa(detallePlanSFPA.getDesEstatusPlanSfpa());
 		planSFPAResponse.setNumPago(detallePlanSFPA.getNumPago());
 		contratanteRequest.setPersona(AppConstantes.TITULAR);
 		contratanteRequest.setIdPersona(detallePlanSFPA.getIdPersona());
