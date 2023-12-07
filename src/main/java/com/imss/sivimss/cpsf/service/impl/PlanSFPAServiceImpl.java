@@ -158,8 +158,6 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			UsuarioDto user = datosUtil.getUserData(authentication);
 			
 			planSFPARequest.setIdUsuario(user.getIdUsuario());
-			
-			planSFPARequest.setIdVelatorio(user.getIdVelatorio());
 
 			PlanSFPAMapper planSFPAMapper = session.getMapper(PlanSFPAMapper.class);
 			
