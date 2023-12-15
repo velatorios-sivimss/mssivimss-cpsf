@@ -22,6 +22,7 @@ public class PagoSFPAResponse {
 	private Integer idEstatus;
 	private Double importePagado;
 	private String folioRecibo;
+	private String metodoPago;
 	
 
 }
