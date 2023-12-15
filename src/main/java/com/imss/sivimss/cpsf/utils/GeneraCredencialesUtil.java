@@ -29,7 +29,7 @@ public class GeneraCredencialesUtil{
 	@Value("${endpoints.envio-correo}")
 	private String urlEnvioCorreo;
 	
-	public String insertarUser(Integer numberUser, String nombreCompleto, String paterno, String contrasenia, Integer idPersona, Integer idUsuario, PlanSFPAMapper planSFPAMapper){
+	public String insertarUser(Integer numberUser, String nombreCompleto, String paterno, String contrasenia, Integer idPersona, Integer idUsuario, Integer idVelatorio, PlanSFPAMapper planSFPAMapper){
 		String hash = passwordEncoder.encode(contrasenia);
 		String[] obtieneNombre = nombreCompleto.split(" ");
         String nombre = obtieneNombre[0];
@@ -44,6 +44,7 @@ public class GeneraCredencialesUtil{
 		usuario.setCveUsuario(user);
 		usuario.setIdOficina(3);
 		usuario.setIdRol(150);
+		usuario.setIdVelatorio(idVelatorio);
 		usuario.setIndActivo(1);
 		usuario.setIndContratante(1);
 		usuario.setIdUsuario(idUsuario);

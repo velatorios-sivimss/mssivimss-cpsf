@@ -12,6 +12,7 @@ import com.imss.sivimss.cpsf.model.request.Contratante;
 import com.imss.sivimss.cpsf.model.request.Domicilio;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.DetallePlanSFPAResponse;
+import com.imss.sivimss.cpsf.model.response.PagoSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.PlanSFPAResponse;
 
 @Component
@@ -50,7 +51,7 @@ public class DatosRequestUtil {
 		return where.toString();
 	}
 	
-	public static  PlanSFPAResponse generarDetallePlan(DetallePlanSFPAResponse detallePlanSFPA) throws SQLException {
+	public static  PlanSFPAResponse generarDetallePlan(DetallePlanSFPAResponse detallePlanSFPA, List<PagoSFPAResponse> pagoSFPA) throws SQLException {
 		PlanSFPAResponse planSFPAResponse = new PlanSFPAResponse();
 		List<Contratante> titularesBeneficiarios = new ArrayList<>(); 
 		Contratante contratanteRequest = new Contratante();
@@ -201,6 +202,7 @@ public class DatosRequestUtil {
 			contratanteRequest4.setCp(cp4);
 			titularesBeneficiarios.add(contratanteRequest4);
 		}
+		planSFPAResponse.setPagoSFPA(pagoSFPA);
 		planSFPAResponse.setTitularesBeneficiarios(titularesBeneficiarios);
 		return planSFPAResponse;
 	}

@@ -32,5 +32,6 @@ public class PlanSFPAResponse {
 	private String fecIngreso;
 	private Integer numPago;
 	private List<Contratante> titularesBeneficiarios;
+	List<PagoSFPAResponse> pagoSFPA;
 
 }

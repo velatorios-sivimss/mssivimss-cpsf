@@ -25,6 +25,7 @@ import com.imss.sivimss.cpsf.model.request.PagoSFPA;
 import com.imss.sivimss.cpsf.model.request.PlanSFPA;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ContratanteResponse;
+import com.imss.sivimss.cpsf.model.response.PagoSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.PersonaResponse;
 import com.imss.sivimss.cpsf.model.response.PlanSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.ReportePagoAnticipadoReponse;
@@ -198,7 +199,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				ContratanteResponse contratante = planSFPAMapper.selectContratante(planSFPARequest.getIdPlanSfpa());
 				
 				String contrasenia= generaCredenciales.generarContrasenia(contratante.getNomPersona() , contratante.getNomApellidoPaterno());
-				String usuario = generaCredenciales.insertarUser(contratante.getIdTitular(),contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contrasenia, contratante.getIdPersona(), user.getIdUsuario(), planSFPAMapper);
+				String usuario = generaCredenciales.insertarUser(contratante.getIdTitular(),contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contrasenia, contratante.getIdPersona(), user.getIdUsuario(), planSFPARequest.getIdVelatorio(), planSFPAMapper);
      			resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia);
 				if (resp.getCodigo() == 200) {
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
@@ -409,7 +410,9 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		try(SqlSession session = sqlSessionFactory.openSession()) {
 			PlanSFPAMapper planSFPAMapper = session.getMapper(PlanSFPAMapper.class);
 			
-			planSFPAResponse = DatosRequestUtil.generarDetallePlan( planSFPAMapper.selectVerdetallePlanSFPA(idPlanSfpa));
+			List<PagoSFPAResponse> pagoSFPA = planSFPAMapper.selectVerdetallePagoSFPA(idPlanSfpa);
+			
+			planSFPAResponse = DatosRequestUtil.generarDetallePlan( planSFPAMapper.selectVerdetallePlanSFPA(idPlanSfpa), pagoSFPA);
 
 		}
 		
