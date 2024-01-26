@@ -1,5 +1,5 @@
 server:
-  port: 8001
+  port: 8080
   servlet:
     contextPath: /${spring.application.name}/v1
 spring: 
@@ -15,9 +15,9 @@ spring:
   datasource:
     platform: mariadb
     driverClassName: org.mariadb.jdbc.Driver
-    url: jdbc:mysql://10.4.15.160:3308/SIVIBDDS?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=America/Mexico_City
-    username: root 
-    password: Maria2023
+    url: jdbc:mysql://10.102.44.18:3306/SIVIBDDS?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=America/Mexico_City
+    username: SIVI_USER
+    password: 51V1_US3R
     timeBetweenEvictionRunsMillis: 1000
     testWhileIdle: true
     validationQuery: SELECT 1
@@ -54,7 +54,7 @@ logging:
 
 
 endpoints:
-   ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
+   ms-reportes: https://sivimss-ds.apps.ocp.imss.gob.mx/mssivimss-reportes-jasp/v1/generales/generar-reporte
    ms-rfc: http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/sat/rfc/
    ms-curp: http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/renapo/curp/
    envio-correo: http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/util/correoElectronico/enviar
@@ -97,5 +97,5 @@ resilience4j.timelimiter:
     msflujo:
         timeout-duration: 3s
 
-ruta-log: 'C:/logs'
+ruta-log: '/sivimss-files/log/'
 enviroment: Develop
