@@ -10,7 +10,7 @@ public class NumeroAPalabra {
 	private static final String[] DECENAS = { "", "dieci", "veinti", "treinta ", "cuarenta ", "cincuenta ", "sesenta ", "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trescientos ", "cuatrocientos ", "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
 	
-	 public String convertirAPalabras(String s, Boolean mayusculas) {
+	 public static String convertirAPalabras(String s, Boolean mayusculas) {
 	        StringBuilder resultado = new StringBuilder();
 	        //si el numero utiliza (.) en lugar de (,) -> se reemplaza
 	        s = s.replace(".", ",");
@@ -40,7 +40,7 @@ public class NumeroAPalabra {
 	        return  Boolean.TRUE.equals((mayusculas)) ? resultado.toString().toUpperCase() : resultado.toString().toLowerCase();
 	    }
 
-	    private StringBuilder convertirALetra(int n) {
+	    private static StringBuilder convertirALetra(int n) {
 	        StringBuilder result = new StringBuilder();
 	        int centenas = n / 100;
 	        int decenas  = (n % 100) / 10;

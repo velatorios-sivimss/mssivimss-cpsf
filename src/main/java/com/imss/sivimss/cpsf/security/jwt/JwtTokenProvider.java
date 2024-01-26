@@ -16,7 +16,6 @@ import com.imss.sivimss.cpsf.utils.AppConstantes;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -80,7 +79,7 @@ public class JwtTokenProvider {
 	public boolean validateToken(String authToken, HttpServletRequest request) {
 		try {
 		
-			Jws<Claims> claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
 			return true;
 		} catch (MalformedJwtException e) {
 			request.setAttribute(AppConstantes.STATUSEXCEPTION, AppConstantes.MALFORMEDJWTEXCEPTION);

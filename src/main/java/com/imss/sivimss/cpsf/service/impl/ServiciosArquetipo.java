@@ -23,9 +23,7 @@ import com.imss.sivimss.cpsf.utils.AppConstantes;
 import com.imss.sivimss.cpsf.utils.PaginadoUtil;
 import com.imss.sivimss.cpsf.utils.Response;
 
-import lombok.extern.java.Log;
 
-@Log
 @Service
 public class ServiciosArquetipo implements PeticionesArquetipo {
 
