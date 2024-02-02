@@ -5,12 +5,14 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import com.imss.sivimss.cpsf.model.request.PlanSFPA;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ContratanteResponse;
 import com.imss.sivimss.cpsf.model.response.PagoSFPAResponse;
+import com.imss.sivimss.cpsf.model.response.PaqueteResponse;
 import com.imss.sivimss.cpsf.model.response.PersonaResponse;
 import com.imss.sivimss.cpsf.model.response.PlanSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.ReportePagoAnticipadoReponse;
@@ -54,6 +57,9 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 	
+	@Autowired
+	private ModelMapper mapper;
+	
 	@Value("${reporte.anexo-convenio-pago-anticipado}")
 	private String convenioPagoAnticipado;
 	
@@ -64,6 +70,9 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 	private GeneraCredencialesUtil generaCredenciales;
 	
 	private Response<Object>response;
+	
+    private	List<Map<String, Object>> servicios = new ArrayList<>();
+	private int i;
 
 	@Override
 	public Response<Object> consultaDetallePlanSfpa(String cveUsuario) {
@@ -119,15 +128,31 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 
 	@Override
 	public Response<Object> consultaPaquetes() {
-		List<Map<String, Object>> result = new ArrayList<>();
+		
+		List<PaqueteResponse> paqueteResponse = new ArrayList<>();
+		List<Map<String, Object>> paquete = new ArrayList<>();
+		
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		
 		try(SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
-			result = consultas.selectNativeQuery(query.consultaPaquetes());
+			paquete = consultas.selectNativeQuery(query.consultaPaquetes());
+			paqueteResponse = Arrays.asList(mapper.map(paquete, PaqueteResponse[].class));
+			
+			paqueteResponse.stream().forEach(registro ->{
+				servicios = consultas.selectNativeQuery(query.consultaServiciosPaquete(registro.getIdPaquete()));
+						Object[] arreglo = new Object[servicios.size()];
+						i=0;
+								servicios.forEach(r ->{
+									arreglo[i]= r.get("servicio");
+									i++;
+									registro.setServiciosPaquetes(arreglo);});
+			});
+		
+			
 		}
 		
-		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, paqueteResponse);
 	}
 
 	@Override
