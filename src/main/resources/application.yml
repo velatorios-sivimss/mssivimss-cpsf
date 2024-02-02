@@ -57,7 +57,7 @@ endpoints:
    ms-reportes: https://sivimss-ds.apps.ocp.imss.gob.mx/mssivimss-reportes-jasp/v1/generales/generar-reporte
    ms-rfc: http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/sat/rfc/
    ms-curp: http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/renapo/curp/
-   envio-correo: https://sivimss-ds.apps.ocp.imss.gob.mx/mssivimss-ser-externos/v1/catalogos/externos/enviar/correo/recuperacontrasenia" #"http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/util/correoElectronico/enviar"
+   envio-correo: https://sivimss-ds.apps.ocp.imss.gob.mx/mssivimss-ser-externos/v1/catalogos/externos/enviar/correo/recuperacontrasenia #"http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/util/correoElectronico/enviar"
   
 reporte:
     anexo-convenio-pago-anticipado: "reportes/generales/ANEXO25-CONVENIO-PAGO-ANTICIPADO.jrxml"  
@@ -97,5 +97,5 @@ resilience4j.timelimiter:
     msflujo:
         timeout-duration: 3s
 
-ruta-log: '/sivimss-files/log/'
+ruta-log: 'C:\logs'
 enviroment: Develop
