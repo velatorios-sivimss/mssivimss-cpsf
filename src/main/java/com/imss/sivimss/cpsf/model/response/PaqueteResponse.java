@@ -10,6 +10,7 @@ public class PaqueteResponse {
 	private Integer idPaquete;
 	private String nomPaquete;
 	private String descPaquete;
+	private Double monPrecio;
 	private Object [] serviciosPaquetes;
 
 }

@@ -209,13 +209,13 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				planSFPAMapper.insertarPlanSfpa(planSFPARequest);
 				
 				for (int i = 0; i < planSFPARequest.getNumPagoMensual(); i++) {
-					LocalDate fechaActual = LocalDate.now();
-					LocalDate fechafinal = fechaActual.plusMonths(i);
+					//LocalDate fechaActual = LocalDate.now();
+					//LocalDate fechafinal = fechaActual.plusMonths(i);
 					PagoSFPA pago = new PagoSFPA ();
 					pago.setIdPlanSfpa(planSFPARequest.getIdPlanSfpa());
 					pago.setIdEstatusPagoSfpa(i == 0?8:7);
 					pago.setMonMensual(planSFPARequest.getMonPrecio()/planSFPARequest.getNumPagoMensual());
-					pago.setFecParcialidad(fechafinal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+					pago.setFecParcialidad("DATE_ADD(CURDATE(), INTERVAL " +i+" MONTH)");
 					pago.setIdUsuario(user.getIdUsuario());
 					
 					planSFPAMapper.insertarPagosfpa(pago);
