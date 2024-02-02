@@ -130,7 +130,7 @@ public class BeanQuerys {
 	public String consultaPaquetes() {
 		SelectQueryUtil selectQueryVelatorio= new SelectQueryUtil();
 		selectQueryVelatorio.select("SP.ID_PAQUETE AS idPaquete","SP.REF_PAQUETE_NOMBRE AS nomPaquete","SP.REF_PAQUETE_DESCRIPCION AS descPaquete","IFNULL(SP.MON_PRECIO,0) as monPrecio")
-		.from(ConsultaConstantes.SVT_PAQUETE_SP).where("IFNULL(SP.ID_PAQUETE ,0) > 0").and(ConsultaConstantes.SP_IND_ACTIVO_1);
+		.from(ConsultaConstantes.SVT_PAQUETE_SP).where("IFNULL(SP.ID_PAQUETE ,0) > 0").and(ConsultaConstantes.SP_IND_ACTIVO_1).and("SP.IND_ONLINE=1");
 		return  selectQueryVelatorio.build();
 	}
 	
@@ -234,6 +234,20 @@ public class BeanQuerys {
 		"IFNULL(SP.NOM_SEGUNDO_APELLIDO, '') AS nomApellidoMaterno","IFNULL(SP.REF_CORREO , '') AS correo").from(ConsultaConstantes.SVT_PLAN_SFPA_SPSFPA)
 		.innerJoin(ConsultaConstantes.SVC_CONTRATANTE_SC, "SC.ID_CONTRATANTE = SPSFPA.ID_TITULAR").innerJoin(ConsultaConstantes.SVC_PERSONA_SP, ConsultaConstantes.SP_ID_PERSONA_SC_ID_PERSONA)
 		.where("IFNULL(SPSFPA.ID_PLAN_SFPA ,0) > 0").and("SPSFPA.ID_PLAN_SFPA =:idPlanSfpa").setParameter(ConsultaConstantes.ID_PLAN_SFPA, idPlanSfpa);
+		return queryUtil.build();
+	}
+
+	public String consultaServiciosPaquete(Integer idPaquete) {
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select(
+				"ss.DES_SERVICIO AS servicio")
+		.from("SVT_PAQUETE sp")
+		.innerJoin("SVT_PAQUETE_SERVICIO ser", "sp.ID_PAQUETE = ser.ID_PAQUETE")
+		.innerJoin("SVT_SERVICIO ss", "ser.ID_SERVICIO = ss.ID_SERVICIO")
+		.where("sp.IND_ACTIVO = 1\r\n"
+				+ " AND sp.IND_ONLINE = 1 "
+				+ " AND ser.IND_ACTIVO = 1")
+		.and("sp.ID_PAQUETE="+idPaquete);
 		return queryUtil.build();
 	}
 	
