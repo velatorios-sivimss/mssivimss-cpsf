@@ -1,0 +1,244 @@
+package com.imss.sivimss.cpsf.service.impl;
+
+import java.io.IOException;
+import java.util.logging.Level;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.imss.sivimss.cpsf.configuration.MyBatisConfig;
+import com.imss.sivimss.cpsf.configuration.mapper.ConvenioPFMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.PagoBitacoraMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.PagoDetalleMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.PagoLineaMapper;
+import com.imss.sivimss.cpsf.model.request.PagoRequest;
+import com.imss.sivimss.cpsf.service.PagoService;
+import com.imss.sivimss.cpsf.utils.LogUtil;
+import com.imss.sivimss.cpsf.utils.Response;
+import com.imss.sivimss.cpsf.model.request.UsuarioDto;
+import com.imss.sivimss.cpsf.model.response.ConPFResponse;
+import com.imss.sivimss.cpsf.model.request.PagoBitacoraRequest;
+import com.imss.sivimss.cpsf.model.request.PagoDetalleRequest;
+
+@Service
+public class PagoServiceImpl implements PagoService {
+
+	@Autowired
+	private LogUtil logUtil;
+	
+	@Autowired
+	private MyBatisConfig myBatisConfig;
+	
+	private static final String ERROR_INFORMACION = "52";
+	private static final String EXITO = "Exito";
+	private static final Integer ESTATUS_PAGADO = 4;
+	private static final Integer PLATAFORMA_LINEA = 2;
+	private static final String TAR_CREDITO = "TARJETA CRÉDITO";
+	private static final String TAR_DEBITO = "TARJETA DÉBITO";
+	
+	@Override
+	public Response<Object> crear(PagoRequest pago, Authentication authentication) throws IOException {	
+		
+		Response<Object> response = new Response<>();
+		Gson gson = new Gson();
+		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		String impresion;
+		pago.setIdUsuario( usuarioDto.getIdUsuario() );
+		
+		if( pago.getIdMetodoPago().equals(3) ) {
+			pago.setEmisorTarjeta( TAR_CREDITO );
+		}else {
+			pago.setEmisorTarjeta( TAR_DEBITO );
+		}
+		
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+				this.getClass().getPackage().toString(), "","Pago con: " + pago.getEmisorTarjeta(), authentication);
+		
+		/* 
+		 * Se inicia un session Factory  
+		 * 
+		 * Usa los datos de MyBatisConfig y toma el datasource de ese mismo archivo
+		 * 
+		 * La trydeclaración -with-resources es una trydeclaración que declara uno 
+		 * o más recursos. Un recurso es un objeto que debe cerrarse una vez finalizado el programa.
+		 * */
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			
+			/* 
+			 * Debemos indicar cual o cuales Mapper vamos a utilizar
+			 * (Asegurate de declararlo en tu archivo MyBatisConfig.class
+			 * configuration.addMapper(NombreDeMiMapper.class);)
+			 */
+			PagoLineaMapper pagoLineaMapper = session.getMapper(PagoLineaMapper.class);
+
+			
+			try {
+				/* 
+				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
+				 * 1._ accedemos al metodo de nuestro objeto mapper 
+				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
+				 * 3._ Seteamos la data que vamos a devolver como respuesta
+				 *  */
+				
+				pagoLineaMapper.nuevoRegistroObj(pago);
+				//response= new Response<>(false, 200, EXITO, pago);
+			} catch (Exception e) {
+				/*
+				 * Para el escenario en que fallen las querys
+				 * 
+				 * 1._ Realizamos un roll back (regresamos los cambios)
+				 * 2._ Cerramos la conexión.
+				 * */
+				
+	        	logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al guardar el pago en Linea", authentication);
+				
+				session.rollback();
+				session.close();
+				throw new IOException(ERROR_INFORMACION, e.getCause());
+			}
+
+			/* 
+			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
+			 * La trydeclaración -with-resources cierra los recursos en automático, 
+			 * nunca esta de más cerrar manualmente la conexión 
+			 */
+			session.commit();
+			session.close();
+		}
+		
+		impresion = gson.toJson(pago);
+		
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+				this.getClass().getPackage().toString(), "","Registro insertado: " + impresion, authentication);
+		
+		//Preparando registro Pago Bitacora
+		PagoBitacoraRequest pagoBitacora = new PagoBitacoraRequest();
+		pagoBitacora.setIdRegistro( pago.getIdRegistro() );
+		pagoBitacora.setIdFlujoPagos( pago.getIdFlujoPagos() );
+		pagoBitacora.setIdVelatorio( pago.getIdVelatorio() );
+		pagoBitacora.setNomContratante( pago.getNomContratante() );
+		pagoBitacora.setFolio( pago.getFolio() );
+		pagoBitacora.setImporteRegistro( pago.getImporte() );
+		pagoBitacora.setEstatusPago(ESTATUS_PAGADO);
+		pagoBitacora.setIdUsuarioAlta( usuarioDto.getIdUsuario() );
+		pagoBitacora.setIdPlataforma( PLATAFORMA_LINEA );
+		
+		PagoDetalleRequest pagoDetalle = new PagoDetalleRequest();
+		pagoDetalle.setIdMetodoPago( pago.getIdMetodoPago() );
+		pagoDetalle.setImporte( pago.getImporte() );
+		pagoDetalle.setNumAutorizacion( pago.getNumAprobacion() );
+		pagoDetalle.setFecPago( pago.getFecTransaccion() );
+		pagoDetalle.setEstatusPago(ESTATUS_PAGADO);
+		pagoDetalle.setIdUsuarioAlta( usuarioDto.getIdUsuario() );
+		
+		switch(pago.getIdFlujoPagos()) {
+
+		case 2:
+			response = crearCon(pago, authentication, pagoBitacora, pagoDetalle);	
+			break;
+		case 3:
+			response = crearRenCon(pago, authentication, pagoBitacora, pagoDetalle);	
+			break;
+		case 4:
+			response = crearPA(pago, authentication);
+			break;
+		default:
+			break;
+		
+		}
+		
+		return response;
+	}
+
+	@Override
+	public Response<Object> obtener(int idPagoLinea) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private Response<Object> crearCon(PagoRequest pago, Authentication authentication, PagoBitacoraRequest pagoBitacora,
+			PagoDetalleRequest pagoDetalle) throws IOException {
+		
+		Response<Object> response = null;
+		ConPFResponse conPF;
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			
+			/* 
+			 * Debemos indicar cual o cuales Mapper vamos a utilizar
+			 * (Asegurate de declararlo en tu archivo MyBatisConfig.class
+			 * configuration.addMapper(NombreDeMiMapper.class);)
+			 */
+			ConvenioPFMapper convenioPFMapper = session.getMapper(ConvenioPFMapper.class);
+			PagoBitacoraMapper pagoBitacoraMapper = session.getMapper(PagoBitacoraMapper.class);
+			PagoDetalleMapper pagoDetalleMapper = session.getMapper(PagoDetalleMapper.class);
+			
+			
+			try {
+				/* 
+				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
+				 * 1._ accedemos al metodo de nuestro objeto mapper 
+				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
+				 * 3._ Seteamos la data que vamos a devolver como respuesta
+				 *  */
+				
+				conPF = convenioPFMapper.selectDatos( pago.getIdRegistro() );
+				pagoBitacora.setFechaRegistro( conPF.getFecInicio() );
+				pagoBitacoraMapper.nuevoRegistroObj( pagoBitacora );
+				pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
+				pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
+				convenioPFMapper.actualizarRegistroObj( pago.getIdRegistro(), pago.getIdUsuario());
+				
+				response= new Response<>(false, 200, EXITO, pago);
+				
+			} catch (Exception e) {
+				/*
+				 * Para el escenario en que fallen las querys
+				 * 
+				 * 1._ Realizamos un roll back (regresamos los cambios)
+				 * 2._ Cerramos la conexión.
+				 * */
+				
+				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear el Convenio PF: ", authentication);
+				
+				session.rollback();
+				session.close();
+				throw new IOException(ERROR_INFORMACION, e.getCause());
+			}
+
+			/* 
+			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
+			 * La trydeclaración -with-resources cierra los recursos en automático, 
+			 * nunca esta de más cerrar manualmente la conexión 
+			 */
+			session.commit();
+			session.close();
+		}
+		
+		
+		
+		return response;
+	}
+	
+	private Response<Object> crearRenCon(PagoRequest pago, Authentication authentication, PagoBitacoraRequest pagoBitacora,
+			PagoDetalleRequest pagoDetalle) {
+		Response<Object> response = null;
+		
+		return response;
+	}
+	
+	private Response<Object> crearPA(PagoRequest pago, Authentication authentication) {
+		Response<Object> response = null;
+		
+		return response;
+	}
+
+}
