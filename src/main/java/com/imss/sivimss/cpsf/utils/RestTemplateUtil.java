@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Component
 public class RestTemplateUtil {
 
@@ -120,14 +121,18 @@ public class RestTemplateUtil {
 	 * @return
 	 */
 	public Response<Object> sendPostRequestByteArrayToken(String url, Object body, String subject,
-			Class<?> clazz) {
+			Class<?> clazz) throws IOException {
+		Response<Object> responseBody;
 		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
 
 		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+		ResponseEntity<?> responseEntity = null;
 
-		 ResponseEntity<Object> responseEntity = (ResponseEntity<Object>) restTemplate.postForEntity(url, request, clazz);
+		responseEntity = restTemplate.postForEntity(url, request, clazz);
 
-		return (Response<Object>) responseEntity.getBody();
+		responseBody = (Response<Object>) responseEntity.getBody();
+
+		return responseBody;
 	}
 
 	/**

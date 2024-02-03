@@ -25,9 +25,14 @@ public class ProviderServiceRestTemplate {
 
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+	private static final String MENSAJE = "Ha ocurrido un error al recuperar la informacion";
 
 	private static final Logger log = LoggerFactory.getLogger(ProviderServiceRestTemplate.class);
 
+	
+	
+	
+	
 	@SuppressWarnings("unchecked")
 	public Response<Object> consumirServicio(Map<String, Object> dato, String url, Authentication authentication)
 			throws IOException {
@@ -55,11 +60,16 @@ public class ProviderServiceRestTemplate {
 	}
 	
 	public Response<Object> consumirServicio(Object dato, String url) throws IOException {
-		Response<Object> respuestaGenerado=restTemplateUtil.sendPostRequestByteArrayToken(url, dato,jwtTokenProvider.createToken(""), Response.class);
-		return validarResponse(respuestaGenerado);
+		try {
+			Response<Object> respuestaGenerado=restTemplateUtil.sendPostRequestByteArrayToken(url, dato,jwtTokenProvider.createToken(""), Response.class);
+			return validarResponse(respuestaGenerado);
+		} catch (IOException exception) {
+			log.error( MENSAJE );
+			throw exception;
+		}
 	}
 	
-	public Response<Object> validarResponse(Response<?> respuestaGenerado) {
+	public Response<Object> validarResponse(Response<Object> respuestaGenerado) {
 		String codigo = respuestaGenerado.getMensaje().substring(0, 3);
 		if (codigo.equals("500") || codigo.equals("404") || codigo.equals("400") || codigo.equals("403")) {
 			Gson gson = new Gson();
@@ -71,7 +81,7 @@ public class ProviderServiceRestTemplate {
 					.mensaje(apiExceptionResponse.getMensaje()).datos(apiExceptionResponse.getDatos()).build();
 
 		}
-		return (Response<Object>) respuestaGenerado;
+		return respuestaGenerado;
 	}
 
 	
