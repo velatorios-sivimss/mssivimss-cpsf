@@ -93,7 +93,7 @@ public interface PlanSFPAMapper {
 	public int insertarPlanSfpa(@Param("plansfpa")PlanSFPA planSFPARequest);
 	
 	@Insert(value = "INSERT INTO SVT_PAGO_SFPA (ID_PLAN_SFPA, IMP_MONTO_MENSUAL, FEC_PARCIALIDAD, ID_ESTATUS_PAGO, IND_ACTIVO, ID_USUARIO_ALTA) "
-			+ "VALUES (#{pago.idPlanSfpa},#{pago.monMensual},#{pago.fecParcialidad},#{pago.idEstatusPagoSfpa},#{pago.indActivo},#{pago.idUsuario})")
+			+ "VALUES (#{pago.idPlanSfpa},#{pago.monMensual},DATE_ADD(CURDATE(), INTERVAL #{pago.i} MONTH),#{pago.idEstatusPagoSfpa},#{pago.indActivo},#{pago.idUsuario})")
 	@Options(useGeneratedKeys = true,keyProperty = "pago.idPagoSfpa", keyColumn="ID_PAGO_SFPA")
 	public int insertarPagosfpa(@Param("pago")PagoSFPA pagoSFPARequest);
 	

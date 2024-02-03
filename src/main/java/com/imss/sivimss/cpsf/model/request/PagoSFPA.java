@@ -17,5 +17,6 @@ public class PagoSFPA {
 	private String fecParcialidad;
 	private Integer indActivo = 1;
 	private Integer idUsuario;
+	private Integer i;
 
 }

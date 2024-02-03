@@ -215,7 +215,8 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 					pago.setIdPlanSfpa(planSFPARequest.getIdPlanSfpa());
 					pago.setIdEstatusPagoSfpa(i == 0?8:7);
 					pago.setMonMensual(planSFPARequest.getMonPrecio()/planSFPARequest.getNumPagoMensual());
-					pago.setFecParcialidad("DATE_ADD(CURDATE(), INTERVAL " +i+" MONTH)");
+					//pago.setFecParcialidad("DATE_ADD(CURDATE(), INTERVAL " +i+" MONTH)");
+					pago.setI(i);
 					pago.setIdUsuario(user.getIdUsuario());
 					
 					planSFPAMapper.insertarPagosfpa(pago);
