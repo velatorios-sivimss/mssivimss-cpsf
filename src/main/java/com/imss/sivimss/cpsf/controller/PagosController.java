@@ -58,8 +58,8 @@ public class PagosController {
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> obetenerPago(@PathVariable("id") @Min(1) int id, Authentication authentication)	throws Throwable {
-		Response<Object> response = pagoService.obtener(id);
+	public CompletableFuture<Object> obetenerPago(@PathVariable("id") @Min(1) int id, Authentication authentication) throws Throwable {
+		Response<Object> response = pagoService.obtener(id, authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
@@ -71,7 +71,7 @@ public class PagosController {
 	
 
 	@SuppressWarnings("unused")
-	private CompletableFuture<Object> fallbackConsulta(Authentication authentication,
+	private CompletableFuture<Object> fallbackConsulta(@PathVariable("id") @Min(1) int id,Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),CONSULTA,authentication);

@@ -21,6 +21,7 @@ import com.imss.sivimss.cpsf.service.PagoService;
 import com.imss.sivimss.cpsf.utils.LogUtil;
 import com.imss.sivimss.cpsf.utils.Response;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
+import com.imss.sivimss.cpsf.model.response.ComPagoResponse;
 import com.imss.sivimss.cpsf.model.response.ConPFResponse;
 import com.imss.sivimss.cpsf.model.response.RenConPFResponse;
 import com.imss.sivimss.cpsf.model.request.PagoBitacoraRequest;
@@ -159,9 +160,63 @@ public class PagoServiceImpl implements PagoService {
 	}
 
 	@Override
-	public Response<Object> obtener(int idPagoLinea) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response<Object> obtener(int idPagoLinea, Authentication authentication ) 
+			throws IOException{
+		
+		Response<Object> response = null;
+		ComPagoResponse comPagoResponse;
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+				this.getClass().getPackage().toString(), "","Id a Buscar: " + idPagoLinea, authentication);
+		
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			
+			/* 
+			 * Debemos indicar cual o cuales Mapper vamos a utilizar
+			 * (Asegurate de declararlo en tu archivo MyBatisConfig.class
+			 * configuration.addMapper(NombreDeMiMapper.class);)
+			 */
+			PagoLineaMapper pagoLineaMapper = session.getMapper(PagoLineaMapper.class);
+			
+			try {
+				/* 
+				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
+				 * 1._ accedemos al metodo de nuestro objeto mapper 
+				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
+				 * 3._ Seteamos la data que vamos a devolver como respuesta
+				 *  */
+				
+				comPagoResponse = pagoLineaMapper.selectDatos( idPagoLinea );
+				
+				response= new Response<>(false, 200, EXITO, comPagoResponse);
+				
+			} catch (Exception e) {
+				/*
+				 * Para el escenario en que fallen las querys
+				 * 
+				 * 1._ Realizamos un roll back (regresamos los cambios)
+				 * 2._ Cerramos la conexión.
+				 * */
+				
+				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar el pago: ", authentication);
+				
+				session.rollback();
+				session.close();
+				throw new IOException(ERROR_INFORMACION, e.getCause());
+			}
+
+			/* 
+			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
+			 * La trydeclaración -with-resources cierra los recursos en automático, 
+			 * nunca esta de más cerrar manualmente la conexión 
+			 */
+			session.commit();
+			session.close();
+		}
+		
+		return response;
 	}
 	
 	private Response<Object> crearCon(PagoRequest pago, Authentication authentication, PagoBitacoraRequest pagoBitacora,
