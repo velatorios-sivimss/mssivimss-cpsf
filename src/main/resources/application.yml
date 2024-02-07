@@ -64,7 +64,7 @@ reporte:
 
 jwt:
   login: ${msit_SECRET_KEY_LOGIN}
-  secretkey-flujo: ${msit_SECRET_KEY}
+  secretkey-flujo: ${msit_SECRET_KEY_DOMINIO}
   expiration-milliseconds: ${msit_SECRET_KEY_EXPIRATION}
 
 management:
