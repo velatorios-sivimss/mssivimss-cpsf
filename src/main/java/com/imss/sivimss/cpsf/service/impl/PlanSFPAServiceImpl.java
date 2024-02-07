@@ -227,11 +227,11 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				String contrasenia= generaCredenciales.generarContrasenia(contratante.getNomPersona() , contratante.getNomApellidoPaterno());
 				String usuario = generaCredenciales.insertarUser(contratante.getIdTitular(),contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contrasenia, contratante.getIdPersona(), user.getIdUsuario(), planSFPARequest.getIdVelatorio(), planSFPAMapper);
      			resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia);
-			/*
+			
 			if (resp.getCodigo() == 200) {
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
-				} */
+				} 
 			} catch (Exception e) {
 				e.printStackTrace();
 				session.rollback();
