@@ -1,6 +1,7 @@
 package com.imss.sivimss.cpsf.configuration.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
@@ -93,7 +94,7 @@ public interface PlanSFPAMapper {
 	public int insertarPlanSfpa(@Param("plansfpa")PlanSFPA planSFPARequest);
 	
 	@Insert(value = "INSERT INTO SVT_PAGO_SFPA (ID_PLAN_SFPA, IMP_MONTO_MENSUAL, FEC_PARCIALIDAD, ID_ESTATUS_PAGO, IND_ACTIVO, ID_USUARIO_ALTA) "
-			+ "VALUES (#{pago.idPlanSfpa},#{pago.monMensual},#{pago.fecParcialidad},#{pago.idEstatusPagoSfpa},#{pago.indActivo},#{pago.idUsuario})")
+			+ "VALUES (#{pago.idPlanSfpa},#{pago.monMensual},DATE_ADD(CURDATE(), INTERVAL #{pago.i} MONTH),#{pago.idEstatusPagoSfpa},#{pago.indActivo},#{pago.idUsuario})")
 	@Options(useGeneratedKeys = true,keyProperty = "pago.idPagoSfpa", keyColumn="ID_PAGO_SFPA")
 	public int insertarPagosfpa(@Param("pago")PagoSFPA pagoSFPARequest);
 	
@@ -102,7 +103,8 @@ public interface PlanSFPAMapper {
 			+ "(SELECT IFNULL(MAX(SPSFPA.ID_PLAN_SFPA), 0) + 1 FROM SVT_PLAN_SFPA SPSFPA )) AS NUM_FOLIO_PLAN_SFPA FROM DUAL )")
     String  selectnumFolioPlanSfpa(Integer idVelatorio, Integer idPaquete, Integer idTipoPagoMensual);
 	
-	@Select("SELECT  CONCAT(IFNULL(P1.NOM_PERSONA,''),' ',IFNULL(P1.NOM_PRIMER_APELLIDO,''), ' ',IFNULL(P1.NOM_SEGUNDO_APELLIDO,'')) AS nombreTitular   , SPIS.DES_PAIS AS nacionalidadTitular   , P1.CVE_RFC AS rfcTitular  , DO1.REF_CALLE AS calleTitular   , "
+	@Select("SELECT PSFPA.IND_TITULAR_SUBSTITUTO indTitularSubs, P1.FEC_NAC fecNacTitular, "
+			+ "CONCAT(IFNULL(P1.NOM_PERSONA,''),' ',IFNULL(P1.NOM_PRIMER_APELLIDO,''), ' ',IFNULL(P1.NOM_SEGUNDO_APELLIDO,'')) AS nombreTitular   , SPIS.DES_PAIS AS nacionalidadTitular   , P1.CVE_RFC AS rfcTitular  , DO1.REF_CALLE AS calleTitular   , "
 			+ "DO1.NUM_EXTERIOR AS numExterior   , DO1.NUM_INTERIOR AS numInterior  , DO1.REF_COLONIA AS colonia   , DO1.REF_CP AS codigoPostal  , DO1.REF_MUNICIPIO AS municipio   , DO1.REF_ESTADO AS estado  , P1.REF_CORREO AS correo  , P1.REF_TELEFONO AS telefono  , "
 			+ "P1.REF_TELEFONO_FIJO AS telefonoFijo   , PQ.MON_PRECIO as totalImporte   , TPM.DES_TIPO_PAGO_MENSUAL AS numPago   , CONCAT(DO.REF_MUNICIPIO, ', ', DO.REF_ESTADO) AS ciudadFirma   , CONCAT(DATE_FORMAT(PSFPA.FEC_ALTA, '%d de '),ELT(MONTH(PSFPA.FEC_ALTA), "
 			+ "\"ENERO\", \"FEBRERO\", \"MARZO\", \"ABRIL\", \"MAYO\", \"JUNIO\", \"JULIO\", \"AGOSTO\", \"SEPTIEMBRE\", \"OCTUBRE\", \"NOVIEMBRE\", \"DICIEMBRE\"),DATE_FORMAT(PSFPA.FEC_ALTA, ' de %Y')) AS fechaFirma  , PQ.REF_PAQUETE_NOMBRE AS nomPaquete   ,"
@@ -146,7 +148,7 @@ public interface PlanSFPAMapper {
 			+ "pg.idPlanSFPA, pg.velatorio, DATE_FORMAT(pg.fechaParcialidad, '%d/%m/%Y') as fechaParcialidad, pg.importeMensual, pg.estatusPago, pg.importePagado, case when pg.importePagado < pg.importeMensual && pg.fechaParcialidad = CURDATE() "
 			+ "then true when pg.importePagado = pg.importeMensual then false else false end as validaPago, pg.importePagado , pg.importeMensual , pg.fechaParcialidad , case when pg.idEstatus = 2 then 0 when month(pg.fechaParcialidad) = month(CURDATE()) "
 			+ "&& ((pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora) > 0 then (pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora when pg.importeMensual - pg.importePagado > 0 then pg.importeMensual - pg.importePagado "
-			+ "else pg.importeMensual end as importeAcumulado, pg.folioRecibo, (select GROUP_CONCAT(sm.DES_METODO_PAGO) from SVC_BITACORA_PAGO_ANTICIPADO bp inner join svc_metodo_pago sm on bp.ID_METODO_PAGO = sm.ID_METODO_PAGO "
+			+ "else pg.importeMensual end as importeAcumulado, pg.folioRecibo, (select GROUP_CONCAT(sm.DES_METODO_PAGO) from SVC_BITACORA_PAGO_ANTICIPADO bp inner join SVC_METODO_PAGO sm on bp.ID_METODO_PAGO = sm.ID_METODO_PAGO "
 			+ "where bp.IND_ACTIVO = 1 and bp.ID_PAGO_SFPA = pg.idPagoSFPA) as metodoPago from ( select ps.ID_PAGO_SFPA as idPagoSFPA, ps.ID_PLAN_SFPA as idPlanSFPA, ps.ID_ESTATUS_PAGO as idEstatus, v.DES_VELATORIO as velatorio,"
 			+ " ps.FEC_PARCIALIDAD as fechaParcialidad, ps.IMP_MONTO_MENSUAL as importeMensual, ep.DES_ESTATUS_PAGO_ANTICIPADO as estatusPago, ( select (IFNULL(SUM(bpa.IMP_PAGO), 0) + IFNULL(SUM(bpa.IMP_AUTORIZADO_VALE_PARITARIO), 0)) "
 			+ "from SVC_BITACORA_PAGO_ANTICIPADO bpa where bpa.IND_ACTIVO = 1 and bpa.ID_PAGO_SFPA = ps.ID_PAGO_SFPA) as importePagado, ps.IND_ACTIVO, ( select IFNULL(SUM(sps.IMP_MONTO_MENSUAL), 0) from SVT_PAGO_SFPA sps where "
@@ -162,6 +164,9 @@ public interface PlanSFPAMapper {
 	@Select("SELECT TIP_PARAMETRO AS firmDir FROM SVC_PARAMETRO_SISTEMA sps WHERE sps.ID_FUNCIONALIDAD = 25 AND sps.DES_PARAMETRO = 'FIRMA_DIRECTORA'")
 	public String getImagenFirma();
 	
+	@Select("SELECT TIP_PARAMETRO AS nomFibeso FROM SVC_PARAMETRO_SISTEMA sps WHERE sps.ID_FUNCIONALIDAD = 20 AND sps.DES_PARAMETRO = 'NOMBRE FIBESO'")
+	public String getNomFibeso();
+	
 	@Select("SELECT SPSFPA.ID_TITULAR as idTitular, SP.ID_PERSONA AS idPersona, IFNULL(SP.NOM_PERSONA, '') AS nomPersona, IFNULL(SP.NOM_PRIMER_APELLIDO, '') AS nomApellidoPaterno, "
 			+ "IFNULL(SP.NOM_SEGUNDO_APELLIDO, '') AS nomApellidoMaterno, IFNULL(SP.REF_CORREO , '') AS correo FROM SVT_PLAN_SFPA SPSFPA  INNER JOIN SVC_CONTRATANTE SC ON "
 			+ "SC.ID_CONTRATANTE = SPSFPA.ID_TITULAR  INNER JOIN SVC_PERSONA SP ON SP.ID_PERSONA = SC.ID_PERSONA  WHERE IFNULL(SPSFPA.ID_PLAN_SFPA ,0) > 0  AND SPSFPA.ID_PLAN_SFPA = #{idPlanSfpa}")
@@ -174,4 +179,6 @@ public interface PlanSFPAMapper {
 	@Select("SELECT STB.ID_TITULAR_BENEFICIARIOS AS idTitularBeneficiarios, SD.ID_DOMICILIO AS idDomicilio, SP.ID_PERSONA AS idPersona FROM SVC_PERSONA SP  LEFT JOIN SVT_TITULAR_BENEFICIARIOS STB ON SP.ID_PERSONA = STB.ID_PERSONA  "
 			+ " LEFT JOIN SVT_DOMICILIO SD ON SD.ID_DOMICILIO = STB.ID_DOMICILIO  WHERE IFNULL(SP.ID_PERSONA , 0) > 0  ${where}")
 	public PersonaResponse selectExisteTitularBeneficiarios(@Param("where")String where);
+
+
 }

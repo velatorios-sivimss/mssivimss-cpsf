@@ -15,6 +15,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+
+
+
 @Component
 public class RestTemplateUtil {
 
@@ -120,14 +123,18 @@ public class RestTemplateUtil {
 	 * @return
 	 */
 	public Response<Object> sendPostRequestByteArrayToken(String url, Object body, String subject,
-			Class<?> clazz) {
+			Class<?> clazz) throws IOException {
+		Response<Object> responseBody;
 		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
 
 		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+		ResponseEntity<?> responseEntity = null;
 
-		 ResponseEntity<Object> responseEntity = (ResponseEntity<Object>) restTemplate.postForEntity(url, request, clazz);
+		responseEntity = restTemplate.postForEntity(url, request, clazz);
 
-		return (Response<Object>) responseEntity.getBody();
+		responseBody = (Response<Object>) responseEntity.getBody();
+
+		return responseBody;
 	}
 
 	/**
@@ -215,6 +222,34 @@ public class RestTemplateUtil {
 		header.setAccept(Arrays.asList(MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON));
 		header.set("Authorization", "Bearer " + subject);
 		return header;
+	}
+
+	public Response<?> sendPostRequestByteArrayReportesToken(String url, DatosReporteDTO body,
+			String subject, Class<Response> clazz) throws IOException {
+
+		Response<?> responseBody = new Response<>();
+		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
+
+		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+		ResponseEntity<?> responseEntity = null;
+		try {
+			responseEntity = restTemplate.postForEntity(url, request, clazz);
+			if (responseEntity.getStatusCode() == HttpStatus.OK && responseEntity.getBody() != null) {
+				responseBody = (Response<List<String>>) responseEntity.getBody();
+			} else {
+				throw new IOException("Ha ocurrido un error al enviar");
+			}
+		} catch (IOException ioException) {
+			throw ioException;
+		} catch (Exception e) {
+			//log.error("Fallo al consumir el servicio, {}", e.getMessage());
+			responseBody.setCodigo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			responseBody.setError(true);
+			responseBody.setMensaje(e.getMessage());
+		}
+
+		return responseBody;
+	
 	}
 
 }

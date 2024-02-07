@@ -38,18 +38,7 @@ public class JwtTokenProvider {
 
 
 	public String createToken(String subject) {
-		Gson gson= new Gson();
-		UsuarioDto usuario=gson.fromJson(subject, UsuarioDto.class);
-		validarUsuario(usuario);
-		String datosUsuario = "{" + "\"idVelatorio\":" + usuario.getIdVelatorio() + "," 
-				+ "\"idRol\":"	+ usuario.getIdRol() + "," + "\"desRol\":'" + usuario.getDesRol() + "',"
-				+ "\"idOficina\":"	+ usuario.getIdOficina() + "," + "\"idUsuario\":" + usuario.getIdUsuario() + ","
-				+ "\"cveUsuario\":'"	+ usuario.getCveUsuario() + "'," + "\"cveMatricula\":'" + usuario.getCveMatricula() + "',"
-				+ "\"nombre\":'"	+ usuario.getNombre() + "'," + "\"curp\":'" + usuario.getCurp() + "',"
-				+ "\"idDelegacion\":" + usuario.getIdDelegacion()+ "}";			
-		
-		Map<String, Object> claims = Jwts.claims().setSubject(datosUsuario);
-		
+		Map<String, Object> claims = Jwts.claims().setSubject(subject);
 		Date now = new Date();
 		Date exp = new Date(now.getTime() + Long.parseLong(expiration) * 1000);
 		return Jwts.builder().setHeaderParam("sistema", "sivimss").setClaims(claims).setIssuedAt(now).setExpiration(exp)
