@@ -11,6 +11,8 @@ import lombok.Setter;
 public class ReportePagoAnticipadoReponse {
 
 private String nombreTitular;
+//param
+private String fecNacTitular;
 private String nacionalidadTitular;
 private String rfcTitular;
 private String calleTitular;
@@ -50,4 +52,7 @@ private String direccionB2;
 private String canPagoPalabras;
 private String firmDir;
 private String imgCheck;
+//params
+private String nomFibeso;
+private Boolean indTitularSubs;
 }
