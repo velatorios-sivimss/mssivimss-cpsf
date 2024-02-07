@@ -231,14 +231,19 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			if (resp.getCodigo() == 200) {
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
+					session.commit();
 				} 
+			
 			} catch (Exception e) {
 				e.printStackTrace();
 				session.rollback();
 				session.close();
+			}finally {
+				
+				session.close();
 			}
-			session.commit();
-			session.close();
+		
+			
 		}
 		return response;
 	}
@@ -374,7 +379,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		
 		try {
 			
-			return	MensajeResponseUtil.mensajeConsultaResponseObject(providerRestTemplate.consumirServicio(envioDatos, urlReportes, authentication), AppConstantes.AGREGADO_CORRECTAMENTE);
+			return	MensajeResponseUtil.mensajeConsultaResponseObject(providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes, authentication), AppConstantes.AGREGADO_CORRECTAMENTE);
 		
 		} catch (IOException e) {
 			
@@ -445,4 +450,5 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, planSFPAResponse);
 	}
+
 }

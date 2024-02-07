@@ -45,6 +45,21 @@ public class ProviderServiceRestTemplate {
 			throw exception;
 		}
 	}
+	
+	
+	public Response<Object> consumirServicioReportes(Map<String, Object> dato, String url,
+			Authentication authentication) throws IOException {
+		try {
+			// esto es hasta que se tenga la parte de token
+			return (Response<Object>) restTemplateUtil.sendPostRequestByteArrayReportesToken(url,
+					new DatosReporteDTO(dato), jwtTokenProvider.createToken((String) authentication.getPrincipal()),
+					//new DatosReporteDTO(dato), jwtTokenProvider.createToken(""),
+					Response.class);
+		} catch (IOException exception) {
+			log.error("ERROR_RECUPERAR_INFORMACION");
+			throw exception;
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	public Response<Object> consumirServicioArchivo(String datos, MultipartFile[] files, String url,
