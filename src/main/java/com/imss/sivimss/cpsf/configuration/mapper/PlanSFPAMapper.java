@@ -1,6 +1,7 @@
 package com.imss.sivimss.cpsf.configuration.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
@@ -146,7 +147,7 @@ public interface PlanSFPAMapper {
 			+ "pg.idPlanSFPA, pg.velatorio, DATE_FORMAT(pg.fechaParcialidad, '%d/%m/%Y') as fechaParcialidad, pg.importeMensual, pg.estatusPago, pg.importePagado, case when pg.importePagado < pg.importeMensual && pg.fechaParcialidad = CURDATE() "
 			+ "then true when pg.importePagado = pg.importeMensual then false else false end as validaPago, pg.importePagado , pg.importeMensual , pg.fechaParcialidad , case when pg.idEstatus = 2 then 0 when month(pg.fechaParcialidad) = month(CURDATE()) "
 			+ "&& ((pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora) > 0 then (pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora when pg.importeMensual - pg.importePagado > 0 then pg.importeMensual - pg.importePagado "
-			+ "else pg.importeMensual end as importeAcumulado, pg.folioRecibo, (select GROUP_CONCAT(sm.DES_METODO_PAGO) from SVC_BITACORA_PAGO_ANTICIPADO bp inner join svc_metodo_pago sm on bp.ID_METODO_PAGO = sm.ID_METODO_PAGO "
+			+ "else pg.importeMensual end as importeAcumulado, pg.folioRecibo, (select GROUP_CONCAT(sm.DES_METODO_PAGO) from SVC_BITACORA_PAGO_ANTICIPADO bp inner join SVC_METODO_PAGO sm on bp.ID_METODO_PAGO = sm.ID_METODO_PAGO "
 			+ "where bp.IND_ACTIVO = 1 and bp.ID_PAGO_SFPA = pg.idPagoSFPA) as metodoPago from ( select ps.ID_PAGO_SFPA as idPagoSFPA, ps.ID_PLAN_SFPA as idPlanSFPA, ps.ID_ESTATUS_PAGO as idEstatus, v.DES_VELATORIO as velatorio,"
 			+ " ps.FEC_PARCIALIDAD as fechaParcialidad, ps.IMP_MONTO_MENSUAL as importeMensual, ep.DES_ESTATUS_PAGO_ANTICIPADO as estatusPago, ( select (IFNULL(SUM(bpa.IMP_PAGO), 0) + IFNULL(SUM(bpa.IMP_AUTORIZADO_VALE_PARITARIO), 0)) "
 			+ "from SVC_BITACORA_PAGO_ANTICIPADO bpa where bpa.IND_ACTIVO = 1 and bpa.ID_PAGO_SFPA = ps.ID_PAGO_SFPA) as importePagado, ps.IND_ACTIVO, ( select IFNULL(SUM(sps.IMP_MONTO_MENSUAL), 0) from SVT_PAGO_SFPA sps where "
@@ -174,4 +175,6 @@ public interface PlanSFPAMapper {
 	@Select("SELECT STB.ID_TITULAR_BENEFICIARIOS AS idTitularBeneficiarios, SD.ID_DOMICILIO AS idDomicilio, SP.ID_PERSONA AS idPersona FROM SVC_PERSONA SP  LEFT JOIN SVT_TITULAR_BENEFICIARIOS STB ON SP.ID_PERSONA = STB.ID_PERSONA  "
 			+ " LEFT JOIN SVT_DOMICILIO SD ON SD.ID_DOMICILIO = STB.ID_DOMICILIO  WHERE IFNULL(SP.ID_PERSONA , 0) > 0  ${where}")
 	public PersonaResponse selectExisteTitularBeneficiarios(@Param("where")String where);
+
+
 }
