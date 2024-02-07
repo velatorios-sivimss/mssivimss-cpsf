@@ -224,9 +224,10 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				
 				ContratanteResponse contratante = planSFPAMapper.selectContratante(planSFPARequest.getIdPlanSfpa());
 				
-				String contrasenia= generaCredenciales.generarContrasenia(contratante.getNomPersona() , contratante.getNomApellidoPaterno());
+				//Se anula envio de corrreos
+			/*	String contrasenia= generaCredenciales.generarContrasenia(contratante.getNomPersona() , contratante.getNomApellidoPaterno());
 				String usuario = generaCredenciales.insertarUser(contratante.getIdTitular(),contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contrasenia, contratante.getIdPersona(), user.getIdUsuario(), planSFPARequest.getIdVelatorio(), planSFPAMapper);
-     			resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia);
+     			resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia); */
 			
 			if (resp.getCodigo() == 200) {
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
@@ -375,11 +376,14 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		
 		reportePagoAnticipadoReponse.setImgCheck(planSFPAMapper.getImagenCheck());
 		
+		reportePagoAnticipadoReponse.setNomFibeso(planSFPAMapper.getNomFibeso());
+		
 		Map<String, Object> envioDatos = generarMap(reportePagoAnticipadoReponse);
 		
 		try {
 			
-			return	MensajeResponseUtil.mensajeConsultaResponseObject(providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes, authentication), AppConstantes.AGREGADO_CORRECTAMENTE);
+		//	return	MensajeResponseUtil.mensajeConsultaResponseObject(providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes, authentication), AppConstantes.AGREGADO_CORRECTAMENTE);
+			return	providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes, authentication);
 		
 		} catch (IOException e) {
 			
@@ -399,6 +403,14 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		envioDatos.put("codigoPostal", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCodigoPostal()));
 		envioDatos.put("municipio", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getMunicipio()));
 		envioDatos.put("estado", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getEstado()));
+		//se agregan lineas
+		String direccion=  DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCalleTitular())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNumExterior())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNumInterior())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getColonia())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCodigoPostal())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getMunicipio())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getEstado());
 		envioDatos.put("correo", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCorreo()));
 		envioDatos.put("telefono", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefono()));
 		envioDatos.put("telefonoFijo", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefonoFijo()));
@@ -411,16 +423,18 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		envioDatos.put("servInclPaquete", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getServInclPaquete()));
 		envioDatos.put("correoVelatorio", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCorreoVelatorio()));
 		envioDatos.put("numeroAfiliacion",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNumeroAfiliacion()));
-		envioDatos.put("nombreSustituto",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNombreSustituto()));
-		envioDatos.put("fecNacSustituto",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getFecNacSustituto()));
-		envioDatos.put("rfcSustituto",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getRfcSustituto()));
-		envioDatos.put("telefonoSustituto",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefonoSustituto()));
-		envioDatos.put("direccionSustituto",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getDireccionSustituto()));
+		
+		envioDatos.put("nombreSustituto",Boolean.TRUE.equals(contratoServicioInmediatoResponse.getIndTitularSubs()) ?  DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNombreTitular()) : DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNombreSustituto()));
+		envioDatos.put("fecNacSustituto",Boolean.TRUE.equals(contratoServicioInmediatoResponse.getIndTitularSubs()) ? DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getFecNacTitular()) : DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getFecNacSustituto()));
+		envioDatos.put("rfcSustituto",Boolean.TRUE.equals(contratoServicioInmediatoResponse.getIndTitularSubs()) ? DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getRfcTitular()) : DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getRfcSustituto()));
+		envioDatos.put("telefonoSustituto", Boolean.TRUE.equals(contratoServicioInmediatoResponse.getIndTitularSubs()) ?  DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefono()) : DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefonoSustituto()));
+		envioDatos.put("direccionSustituto",Boolean.TRUE.equals(contratoServicioInmediatoResponse.getIndTitularSubs()) ?direccion : DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getDireccionSustituto()));
+		
 		envioDatos.put("nombreB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNombreB1()));
 		envioDatos.put("fecNacB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getFecNacB1()));
 		envioDatos.put("rfcB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getRfcB1()));
-		envioDatos.put("telefonoB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefonoSustituto()));
-		envioDatos.put("direccionB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getDireccionSustituto()));
+		envioDatos.put("telefonoB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getTelefonoB1()));
+		envioDatos.put("direccionB1",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getDireccionB1()));
 		envioDatos.put("nombreB2",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNombreB2()));
 		envioDatos.put("fecNacB2",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getFecNacB2()));
 		envioDatos.put("rfcB2",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getRfcB2()));
@@ -429,6 +443,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		envioDatos.put("totalLetra",NumeroAPalabra.convertirAPalabras(contratoServicioInmediatoResponse.getTotalImporte(), true));
 		envioDatos.put("firmaDir",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getFirmDir()));
 		envioDatos.put("imgCheck",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getImgCheck()));
+		envioDatos.put("nomFibeso",DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNomFibeso()));
 		envioDatos.put(AppConstantes.TIPO_REPORTE, "pdf");
 		envioDatos.put(AppConstantes.RUTA_NOMBRE_REPORTE, convenioPagoAnticipado);
 	return envioDatos;
