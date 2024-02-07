@@ -103,7 +103,8 @@ public interface PlanSFPAMapper {
 			+ "(SELECT IFNULL(MAX(SPSFPA.ID_PLAN_SFPA), 0) + 1 FROM SVT_PLAN_SFPA SPSFPA )) AS NUM_FOLIO_PLAN_SFPA FROM DUAL )")
     String  selectnumFolioPlanSfpa(Integer idVelatorio, Integer idPaquete, Integer idTipoPagoMensual);
 	
-	@Select("SELECT  CONCAT(IFNULL(P1.NOM_PERSONA,''),' ',IFNULL(P1.NOM_PRIMER_APELLIDO,''), ' ',IFNULL(P1.NOM_SEGUNDO_APELLIDO,'')) AS nombreTitular   , SPIS.DES_PAIS AS nacionalidadTitular   , P1.CVE_RFC AS rfcTitular  , DO1.REF_CALLE AS calleTitular   , "
+	@Select("SELECT PSFPA.IND_TITULAR_SUBSTITUTO indTitularSubs, P1.FEC_NAC fecNacTitular, "
+			+ "CONCAT(IFNULL(P1.NOM_PERSONA,''),' ',IFNULL(P1.NOM_PRIMER_APELLIDO,''), ' ',IFNULL(P1.NOM_SEGUNDO_APELLIDO,'')) AS nombreTitular   , SPIS.DES_PAIS AS nacionalidadTitular   , P1.CVE_RFC AS rfcTitular  , DO1.REF_CALLE AS calleTitular   , "
 			+ "DO1.NUM_EXTERIOR AS numExterior   , DO1.NUM_INTERIOR AS numInterior  , DO1.REF_COLONIA AS colonia   , DO1.REF_CP AS codigoPostal  , DO1.REF_MUNICIPIO AS municipio   , DO1.REF_ESTADO AS estado  , P1.REF_CORREO AS correo  , P1.REF_TELEFONO AS telefono  , "
 			+ "P1.REF_TELEFONO_FIJO AS telefonoFijo   , PQ.MON_PRECIO as totalImporte   , TPM.DES_TIPO_PAGO_MENSUAL AS numPago   , CONCAT(DO.REF_MUNICIPIO, ', ', DO.REF_ESTADO) AS ciudadFirma   , CONCAT(DATE_FORMAT(PSFPA.FEC_ALTA, '%d de '),ELT(MONTH(PSFPA.FEC_ALTA), "
 			+ "\"ENERO\", \"FEBRERO\", \"MARZO\", \"ABRIL\", \"MAYO\", \"JUNIO\", \"JULIO\", \"AGOSTO\", \"SEPTIEMBRE\", \"OCTUBRE\", \"NOVIEMBRE\", \"DICIEMBRE\"),DATE_FORMAT(PSFPA.FEC_ALTA, ' de %Y')) AS fechaFirma  , PQ.REF_PAQUETE_NOMBRE AS nomPaquete   ,"
@@ -162,6 +163,9 @@ public interface PlanSFPAMapper {
 	
 	@Select("SELECT TIP_PARAMETRO AS firmDir FROM SVC_PARAMETRO_SISTEMA sps WHERE sps.ID_FUNCIONALIDAD = 25 AND sps.DES_PARAMETRO = 'FIRMA_DIRECTORA'")
 	public String getImagenFirma();
+	
+	@Select("SELECT TIP_PARAMETRO AS nomFibeso FROM SVC_PARAMETRO_SISTEMA sps WHERE sps.ID_FUNCIONALIDAD = 20 AND sps.DES_PARAMETRO = 'NOMBRE FIBESO'")
+	public String getNomFibeso();
 	
 	@Select("SELECT SPSFPA.ID_TITULAR as idTitular, SP.ID_PERSONA AS idPersona, IFNULL(SP.NOM_PERSONA, '') AS nomPersona, IFNULL(SP.NOM_PRIMER_APELLIDO, '') AS nomApellidoPaterno, "
 			+ "IFNULL(SP.NOM_SEGUNDO_APELLIDO, '') AS nomApellidoMaterno, IFNULL(SP.REF_CORREO , '') AS correo FROM SVT_PLAN_SFPA SPSFPA  INNER JOIN SVC_CONTRATANTE SC ON "
