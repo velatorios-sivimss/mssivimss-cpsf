@@ -19,12 +19,14 @@ public class PersonaPlanSFPA {
 	private String nomPersona;
 	private String primerApellido;
 	private String segundoApellido;
-	private Integer sexo;
+	private String sexo;
 	private String otroSexo;
 	private String fecNacimiento;
 	private String nacionalidad;
 	private Integer idPais;
 	private Integer idEstado;
+	private String pais;
+	private String lugarNac;
 	private String telefono;
 	private String telefonoFijo;
 	private String correo;
