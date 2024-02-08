@@ -88,6 +88,9 @@ public class DatosRequestUtil {
 		contratanteRequest.setFecNacimiento(detallePlanSFPA.getFecNacimiento());
 		contratanteRequest.setIdPais(detallePlanSFPA.getIdPais());
 		contratanteRequest.setIdEstado(detallePlanSFPA.getIdEstado());
+		contratanteRequest.setPais(detallePlanSFPA.getPais());
+		contratanteRequest.setLugarNac(detallePlanSFPA.getLugarNac());
+		contratanteRequest.setNacionalidad(detallePlanSFPA.getNacionalidad());
 		contratanteRequest.setTelefono(detallePlanSFPA.getTelefono());
 		contratanteRequest.setTelefonoFijo(detallePlanSFPA.getTelefonoFijo());
 		contratanteRequest.setCorreo(detallePlanSFPA.getCorreo());
@@ -120,6 +123,9 @@ public class DatosRequestUtil {
 			contratanteRequest2.setFecNacimiento(detallePlanSFPA.getFecNacimiento2());
 			contratanteRequest2.setIdPais(detallePlanSFPA.getIdPais2());
 			contratanteRequest2.setIdEstado(detallePlanSFPA.getIdEstado2());
+			contratanteRequest2.setPais(detallePlanSFPA.getPais2());
+			contratanteRequest2.setLugarNac(detallePlanSFPA.getLugarNac2());
+			contratanteRequest2.setNacionalidad(detallePlanSFPA.getNacionalidad2());
 			contratanteRequest2.setTelefono(detallePlanSFPA.getTelefono2());
 			contratanteRequest2.setTelefonoFijo(detallePlanSFPA.getTelefonoFijo2());
 			contratanteRequest2.setCorreo(detallePlanSFPA.getCorreo2());
@@ -153,6 +159,9 @@ public class DatosRequestUtil {
 			contratanteRequest3.setFecNacimiento(detallePlanSFPA.getFecNacimiento3());
 			contratanteRequest3.setIdPais(detallePlanSFPA.getIdPais3());
 			contratanteRequest3.setIdEstado(detallePlanSFPA.getIdEstado3());
+			contratanteRequest3.setPais(detallePlanSFPA.getPais3());
+			contratanteRequest3.setLugarNac(detallePlanSFPA.getLugarNac3());
+			contratanteRequest3.setNacionalidad(detallePlanSFPA.getNacionalidad3());
 			contratanteRequest3.setTelefono(detallePlanSFPA.getTelefono3());
 			contratanteRequest3.setTelefonoFijo(detallePlanSFPA.getTelefonoFijo3());
 			contratanteRequest3.setCorreo(detallePlanSFPA.getCorreo3());
@@ -186,6 +195,9 @@ public class DatosRequestUtil {
 			contratanteRequest4.setFecNacimiento(detallePlanSFPA.getFecNacimiento4());
 			contratanteRequest4.setIdPais(detallePlanSFPA.getIdPais4());
 			contratanteRequest4.setIdEstado(detallePlanSFPA.getIdEstado4());
+			contratanteRequest4.setPais(detallePlanSFPA.getPais4());
+			contratanteRequest4.setLugarNac(detallePlanSFPA.getLugarNac4());
+			contratanteRequest4.setNacionalidad(detallePlanSFPA.getNacionalidad4());
 			contratanteRequest4.setTelefono(detallePlanSFPA.getTelefono4());
 			contratanteRequest4.setTelefonoFijo(detallePlanSFPA.getTelefonoFijo4());
 			contratanteRequest4.setCorreo(detallePlanSFPA.getCorreo4());
