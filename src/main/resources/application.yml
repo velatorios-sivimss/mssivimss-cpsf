@@ -61,6 +61,7 @@ endpoints:
   
 reporte:
     anexo-convenio-pago-anticipado:  ${msit_ANEXO_CONVENIO_PAGO_ANTICIPADO}
+    comprobante-pago: reportes/plantilla/Comp_Pago_Linea.jrxml
 
 jwt:
   login: ${msit_SECRET_KEY_LOGIN}

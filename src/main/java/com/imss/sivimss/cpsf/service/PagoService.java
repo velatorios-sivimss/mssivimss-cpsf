@@ -12,5 +12,6 @@ public interface PagoService {
 	
 	public Response<Object> crear( PagoRequest pago, Authentication authentication) throws IOException;
 	public Response<Object> obtener( int idPagoLinea, Authentication authentication ) throws IOException;
+	public Response<Object> reporte( int idPagoLinea, Authentication authentication ) throws IOException;
 
 }

@@ -1,11 +1,13 @@
 package com.imss.sivimss.cpsf.controller;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 import javax.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -61,6 +63,20 @@ public class PagosController {
 	public CompletableFuture<Object> obetenerPago(@PathVariable("id") @Min(1) int id, Authentication authentication) throws Throwable {
 		Response<Object> response = pagoService.obtener(id, authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@GetMapping("/reporte/{id}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> reporte(@PathVariable("id") @Min(1) int id, Authentication authentication) throws Throwable {
+		Response<Object> response = pagoService.reporte(id, authentication);
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + "pdf")
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=Comprobante_de_pago." + "pdf")
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
 	/*

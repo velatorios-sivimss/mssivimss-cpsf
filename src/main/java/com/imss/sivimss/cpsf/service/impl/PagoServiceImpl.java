@@ -1,11 +1,15 @@
 package com.imss.sivimss.cpsf.service.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +22,10 @@ import com.imss.sivimss.cpsf.configuration.mapper.PagoLineaMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.RenConvenioPFMapper;
 import com.imss.sivimss.cpsf.model.request.PagoRequest;
 import com.imss.sivimss.cpsf.service.PagoService;
+import com.imss.sivimss.cpsf.utils.AppConstantes;
+import com.imss.sivimss.cpsf.utils.DatosRequestUtil;
 import com.imss.sivimss.cpsf.utils.LogUtil;
+import com.imss.sivimss.cpsf.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.cpsf.utils.Response;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ComPagoResponse;
@@ -36,12 +43,21 @@ public class PagoServiceImpl implements PagoService {
 	@Autowired
 	private MyBatisConfig myBatisConfig;
 	
+	@Autowired
+	private ProviderServiceRestTemplate providerRestTemplate;
+	
+	@Value("${reporte.comprobante-pago}")
+	private String nomReporte;
+	
+	@Value("${endpoints.ms-reportes}")
+	private String urlReportes;
+	
 	private static final String ERROR_INFORMACION = "52";
 	private static final String EXITO = "Exito";
 	private static final Integer ESTATUS_PAGADO = 4;
 	private static final Integer PLATAFORMA_LINEA = 2;
-	private static final String TAR_CREDITO = "TARJETA CRÉDITO";
-	private static final String TAR_DEBITO = "TARJETA DÉBITO";
+	private static final String TAR_CREDITO = "TARJETA DE CRÉDITO";
+	private static final String TAR_DEBITO = "TARJETA DE DÉBITO";
 	
 	@Override
 	public Response<Object> crear(PagoRequest pago, Authentication authentication) throws IOException {	
@@ -350,6 +366,24 @@ public class PagoServiceImpl implements PagoService {
 		Response<Object> response = null;
 		
 		return response;
+	}
+
+	@Override
+	public Response<Object> reporte(int idPagoLinea, Authentication authentication) throws IOException {
+
+		Map<String, Object> envioDatos = new HashMap<>();
+		envioDatos.put("idPagoLinea", idPagoLinea);
+		envioDatos.put(AppConstantes.TIPO_REPORTE, "pdf");
+		envioDatos.put(AppConstantes.RUTA_NOMBRE_REPORTE, nomReporte);
+		
+		try {
+
+				return	providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes, authentication);
+			
+			} catch (IOException e) {
+				
+				return new Response<>(false, HttpStatus.BAD_REQUEST.value(), e.getMessage(), e.getCause());
+			}
 	}
 
 }
