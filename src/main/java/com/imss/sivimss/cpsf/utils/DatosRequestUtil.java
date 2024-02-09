@@ -60,6 +60,8 @@ public class DatosRequestUtil {
 		planSFPAResponse.setNumFolioPlanSFPA(detallePlanSFPA.getNumFolioPlanSfpa());
 		planSFPAResponse.setIdTipoContratacion(detallePlanSFPA.getIdTipoContratacion());
 		planSFPAResponse.setIdPaquete(detallePlanSFPA.getIdPaquete());
+		planSFPAResponse.setNomPaquete(detallePlanSFPA.getNomPaquete());
+		planSFPAResponse.setDesPaquete(detallePlanSFPA.getDesPaquete());
 		planSFPAResponse.setIdTipoPagoMensual(detallePlanSFPA.getIdTipoPagoMensual());
 		planSFPAResponse.setDesTipoPagoMensual(detallePlanSFPA.getDesTipoPagoMensual());
 		planSFPAResponse.setIndTitularSubstituto(detallePlanSFPA.getIndTitularSubstituto());

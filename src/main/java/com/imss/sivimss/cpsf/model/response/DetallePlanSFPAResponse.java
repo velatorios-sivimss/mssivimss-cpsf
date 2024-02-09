@@ -14,6 +14,8 @@ public class DetallePlanSFPAResponse extends DetalleExtPlanSFPAResponse{
 	private String numFolioPlanSfpa;
 	private Integer idTipoContratacion;
 	private Integer idPaquete;
+	private String nomPaquete;
+	private String desPaquete;
 	private Integer idTipoPagoMensual;
 	private Integer desTipoPagoMensual;
 	private Integer indTitularSubstituto;

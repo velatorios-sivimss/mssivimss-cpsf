@@ -32,6 +32,7 @@ public class JwtTokenProvider {
 
 	@Value("${jwt.secretkey-flujo}")
 	private String jwtSecretFlujo;
+	//funcionamuybiendominio
 	
 	@Value("${jwt.expiration-milliseconds}")
 	private String expiration;

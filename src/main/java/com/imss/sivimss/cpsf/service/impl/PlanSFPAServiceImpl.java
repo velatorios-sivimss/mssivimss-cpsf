@@ -218,7 +218,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				}
 			
 				
-				planSFPARequest.setNumFolioPlanSfpa(planSFPAMapper.selectnumFolioPlanSfpa(user.getIdVelatorio(), planSFPARequest.getIdPaquete(), planSFPARequest.getIdTipoPagoMensual()));
+				planSFPARequest.setNumFolioPlanSfpa(planSFPAMapper.selectnumFolioPlanSfpa(planSFPARequest.getIdVelatorio(), planSFPARequest.getIdPaquete(), planSFPARequest.getIdTipoPagoMensual()));
 		
 				planSFPAMapper.insertarPlanSfpa(planSFPARequest);
 				
