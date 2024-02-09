@@ -33,7 +33,7 @@ public interface PlanSFPAMapper {
 	@Insert(value = "INSERT INTO SVC_PERSONA (CVE_RFC , CVE_CURP, CVE_NSS, NOM_PERSONA, NOM_PRIMER_APELLIDO, NOM_SEGUNDO_APELLIDO, NUM_SEXO, REF_OTRO_SEXO, FEC_NAC, ID_PAIS, ID_ESTADO, "
 			+ "REF_TELEFONO, REF_TELEFONO_FIJO, REF_CORREO, TIP_PERSONA, NUM_INE, ID_USUARIO_ALTA)"
 			+ "VALUES (#{persona.rfc},#{persona.curp},#{persona.nss},#{persona.nomPersona},#{persona.primerApellido},#{persona.segundoApellido},#{persona.sexo},#{persona.otroSexo},#{persona.fecNacimiento},#{persona.idPais},"
-			+ "#{persona.idEstado},#{persona.telefono},#{persona.telefonoFijo},#{persona.correo},#{persona.tipoPersona},#{persona.ine},#{persona.idUsuario} )")
+			+ "#{persona.idEstado},#{persona.telefono},#{persona.telefonoFijo},#{persona.correo},'SERVICIOS EN LINEA',#{persona.ine},#{persona.idUsuario} )")
 	@Options(useGeneratedKeys = true,keyProperty = "persona.idPersona", keyColumn="ID_PERSONA")
 	public int insertarPersona(@Param("persona")Contratante persona);
 	
