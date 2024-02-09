@@ -17,6 +17,8 @@ public class PlanSFPAResponse {
 	private String numFolioPlanSFPA;
 	private Integer idTipoContratacion;
 	private Integer idPaquete;
+	private String nomPaquete;
+	private String desPaquete;
 	private Integer idTipoPagoMensual;
 	private Integer desTipoPagoMensual;
 	private Integer indTitularSubstituto;
