@@ -425,8 +425,8 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		String direccion=  DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCalleTitular())+
 				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNumExterior())+
 				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNumInterior())+
-				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getColonia())+
 				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCodigoPostal())+
+				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getColonia())+
 				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getMunicipio())+
 				" "+DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getEstado());
 		envioDatos.put("correo", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getCorreo()));
