@@ -191,21 +191,35 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				obtenerDetalle(planSFPARequest, user, planSFPAMapper);
 				
 				planSFPARequest.setTitular(planSFPARequest.getTitularesBeneficiarios().get(0).getIdContratante());
-				if(planSFPARequest.getTitularesBeneficiarios().size() == 2) {
+				if(planSFPARequest.getIndTitularSubstituto()==0) {
+					
 					planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+			        
+					if(planSFPARequest.getTitularesBeneficiarios().size() == 3) {
+					//	planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+						planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
+					}
+					 if(planSFPARequest.getTitularesBeneficiarios().size() == 4 ) {
+						//planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+					//	planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
+						planSFPARequest.setBeneficiario2(planSFPARequest.getTitularesBeneficiarios().get(3).getIdBeneficiario2());	
+					}
+				
+				}else {
+					if(planSFPARequest.getTitularesBeneficiarios().size() == 2) {
+						//	planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+							planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(1).getIdBeneficiario1());
+						}
+						if(planSFPARequest.getTitularesBeneficiarios().size() == 3 ) {
+							//planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
+						//	planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
+							planSFPARequest.setBeneficiario2(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario2());	
+						}
 				}
-				if(planSFPARequest.getTitularesBeneficiarios().size() == 3) {
-					planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
-					planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
-				}
-				if(planSFPARequest.getTitularesBeneficiarios().size() == 4) {
-					planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
-					planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
-					planSFPARequest.setBeneficiario2(planSFPARequest.getTitularesBeneficiarios().get(3).getIdBeneficiario2());	
-				}
+			
 				
 				planSFPARequest.setNumFolioPlanSfpa(planSFPAMapper.selectnumFolioPlanSfpa(user.getIdVelatorio(), planSFPARequest.getIdPaquete(), planSFPARequest.getIdTipoPagoMensual()));
-				
+		
 				planSFPAMapper.insertarPlanSfpa(planSFPARequest);
 				
 				for (int i = 0; i < planSFPARequest.getNumPagoMensual(); i++) {
@@ -222,18 +236,18 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 					planSFPAMapper.insertarPagosfpa(pago);
 				}
 				
-				ContratanteResponse contratante = planSFPAMapper.selectContratante(planSFPARequest.getIdPlanSfpa());
+			//	ContratanteResponse contratante = planSFPAMapper.selectContratante(planSFPARequest.getIdPlanSfpa());
 				
 				//Se anula envio de corrreos
 			/*	String contrasenia= generaCredenciales.generarContrasenia(contratante.getNomPersona() , contratante.getNomApellidoPaterno());
 				String usuario = generaCredenciales.insertarUser(contratante.getIdTitular(),contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contrasenia, contratante.getIdPersona(), user.getIdUsuario(), planSFPARequest.getIdVelatorio(), planSFPAMapper);
      			resp = generaCredenciales.enviarCorreo(usuario, contratante.getCorreo(), contratante.getNomPersona(), contratante.getNomApellidoPaterno(), contratante.getNomApellidoMaterno(), contrasenia); */
 			
-			if (resp.getCodigo() == 200) {
+				
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
 					session.commit();
-				} 
+				 
 			
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -257,8 +271,10 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				PersonaResponse personaTemp = planSFPAMapper.selectExisteContratante(DatosRequestUtil.condicion(persona));
 				if(personaTemp != null && personaTemp.getIdPersona() != null) {
 					persona.setIdPersona(personaTemp.getIdPersona());
+					persona.setTipoPersona(persona.getPersona()+" onlineA");
 					planSFPAMapper.actualizarPersona(persona);
 				} else {
+					persona.setTipoPersona(persona.getPersona()+" online");
 					planSFPAMapper.insertarPersona(persona);
 				}
 				if(personaTemp != null && personaTemp.getIdDomicilio() != null) {
@@ -277,8 +293,10 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				PersonaResponse personaTemp = planSFPAMapper.selectExisteTitularBeneficiarios(DatosRequestUtil.condicion(persona));
 				if(personaTemp != null && personaTemp.getIdPersona() != null) {
 					persona.setIdPersona(personaTemp.getIdPersona());
+					persona.setTipoPersona(persona.getPersona()+" onlineA");
 					planSFPAMapper.actualizarPersona(persona);
 				} else {
+					persona.setTipoPersona(persona.getPersona()+" online");
 					planSFPAMapper.insertarPersona(persona);
 				}
 				if(personaTemp != null && personaTemp.getIdDomicilio() != null) {
