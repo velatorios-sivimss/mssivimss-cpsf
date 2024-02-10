@@ -19,6 +19,8 @@ import com.imss.sivimss.cpsf.configuration.mapper.PagoBitacoraMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.ConvenioPFMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.PagoDetalleMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.RenConvenioPFMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.BitacoraPAMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.PagoSFPAMapper;
 
 @Service
 public class MyBatisConfig {
@@ -52,6 +54,8 @@ public class MyBatisConfig {
 	    configuration.addMapper(ConvenioPFMapper.class);
 	    configuration.addMapper(PagoDetalleMapper.class);
 	    configuration.addMapper(RenConvenioPFMapper.class);
+	    configuration.addMapper(BitacoraPAMapper.class);
+	    configuration.addMapper(PagoSFPAMapper.class);
 	    
 	    SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
 	    
