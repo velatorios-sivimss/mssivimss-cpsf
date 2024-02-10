@@ -19,10 +19,8 @@ public class PagoRequest {
 	@Min(value=1,message = "El id debe ser mayor a 0")
 	private Integer idVelatorio;
 	
-	@Min(value=1,message = "El id debe ser mayor a 0")
 	private Integer idCliente;
-	
-	@NotBlank(message = "Folio no puede ser vacío")
+
     private String folio;
 	
 	@Min(value=0,message = "El importe debe ser mayor a 0")
@@ -55,5 +53,9 @@ public class PagoRequest {
     private String nomContratante;
 	
 	private Integer idUsuario;
+	
+	private Integer idPagoSFPA;
+	
+	private Integer idPlataforma;
 	
 }
