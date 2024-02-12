@@ -26,7 +26,6 @@ public interface RenConvenioPFMapper {
 			+ "	FEC_ACTUALIZACION = NOW(), \r\n"
 			+ "	ID_USUARIO_MODIFICA = #{idUsuario} \r\n"
 			+ "WHERE ID_RENOVACION_CONVENIO_PF = #{idRenConvenioPF} \r\n"
-			+ "AND ID_ESTATUS IN ('1')"
 			)
 	public int actualizarRegistroObj(@Param("idRenConvenioPF")Integer idRenConvenioPF, @Param("idUsuario")Integer idUsuario);
 }
