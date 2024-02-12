@@ -10,32 +10,21 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuarioDto {
 
-	private Integer idVelatorio;
-	
-	private Integer idPersona;
-
-	private Integer idRol;
-
-	private Integer idDelegacion;
-	
-	private Integer idOficina;
-
 	private Integer idUsuario;
-	
+	private String idEstado;
+	private Integer idRol;
 	private String desRol;
-
-	private String nombre;
-
-	private String curp;
-
-	private String cveMatricula;
-	
+	private Integer idContratante;
+	private String idPais;
 	private String cveUsuario;
-	
-	private String contrasenia;
-	
-	private Integer indActivo;
-	
-	private Integer indContratante;
-	
+	private String cveMatricula;
+	private String nombre;
+	private String curp;
+    private Integer idPersona;
+    private Integer idVelatorio;
+    private Integer idDelegacion;
+    private String contrasenia;
+    private Integer idOficina;
+    private Integer indActivo;
+    
 }

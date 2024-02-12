@@ -46,7 +46,7 @@ public class GeneraCredencialesUtil{
 		usuario.setIdRol(150);
 		usuario.setIdVelatorio(idVelatorio);
 		usuario.setIndActivo(1);
-		usuario.setIndContratante(1);
+		usuario.setIdContratante(1);
 		usuario.setIdUsuario(idUsuario);
 		planSFPAMapper.insertarUsuario(usuario);
 		return user;
