@@ -73,7 +73,7 @@ public class PagoServiceImpl implements PagoService {
 		
 		pago.setIdUsuario( usuarioDto.getIdUsuario() );
 		pago.setIdPlataforma( PLATAFORMA_LINEA );
-		pago.setIdCliente( usuarioDto.getIndContratante() );
+		pago.setIdCliente( usuarioDto.getIdContratante() );
 		
 		if( pago.getIdMetodoPago().equals(3) ) {
 			pago.setEmisorTarjeta( TAR_CREDITO );
