@@ -55,6 +55,9 @@ public class PagoServiceImpl implements PagoService {
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
 	
+	@Value("${formato_fecha_hora}")
+	private String formatoFechaHora;
+	
 	private static final String ERROR_INFORMACION = "52";
 	private static final String EXITO = "Exito";
 	private static final Integer ESTATUS_PAGADO = 4;
@@ -214,7 +217,7 @@ public class PagoServiceImpl implements PagoService {
 				 * 3._ Seteamos la data que vamos a devolver como respuesta
 				 *  */
 				
-				comPagoResponse = pagoLineaMapper.selectDatos( idPagoLinea );
+				comPagoResponse = pagoLineaMapper.selectDatos( formatoFechaHora, idPagoLinea);
 				
 				response= new Response<>(false, 200, EXITO, comPagoResponse);
 				
