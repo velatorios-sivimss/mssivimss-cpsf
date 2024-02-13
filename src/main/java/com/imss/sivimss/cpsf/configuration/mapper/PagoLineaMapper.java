@@ -55,7 +55,7 @@ public interface PagoLineaMapper {
 			+ "PL.CVE_FOLIO_PAGO AS folioPago,\r\n"
 			+ "PL.NUM_TARJETA AS numTarjeta,\r\n"
 			+ "PL.REF_EMISOR AS emisorTarjeta,\r\n"
-			+ "PL.STP_TRANSACCION AS fecTransaccion,\r\n"
+			+ "DATE_FORMAT(PL.STP_TRANSACCION, '${formatoFechaHora}') AS fecTransaccion,\r\n"
 			+ "DEL.ID_DELEGACION AS idDelegacion,\r\n"
 			+ "DEL.DES_DELEGACION AS nomDelegacion,\r\n"
 			+ "VEL.ID_VELATORIO AS idVelatorio,\r\n"
@@ -71,5 +71,5 @@ public interface PagoLineaMapper {
 			+ "PL.ID_PAGO_LINEA = #{idPagoLinea} \r\n"
 			+ "LIMIT 1"
 			)
-	public ComPagoResponse selectDatos(Integer idPagoLinea);
+	public ComPagoResponse selectDatos(@Param("formatoFechaHora")String formatoFechaHora, Integer idPagoLinea);
 }

@@ -101,3 +101,4 @@ resilience4j.timelimiter:
 formato_fecha: ${msit_FORMATO_FECHA}
 ruta-log: ${msit_RUTA_LOG}
 enviroment: ${msit_ENVIRONMENT}
+formato_fecha_hora: ${msit_FORMATO_FECHA_HORA}
