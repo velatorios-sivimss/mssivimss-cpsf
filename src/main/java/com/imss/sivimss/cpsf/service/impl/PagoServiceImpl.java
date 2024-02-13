@@ -218,6 +218,8 @@ public class PagoServiceImpl implements PagoService {
 				 *  */
 				
 				comPagoResponse = pagoLineaMapper.selectDatos( formatoFechaHora, idPagoLinea);
+				String fecha = comPagoResponse.getFecTransaccion().replaceAll("\"", "");
+				comPagoResponse.setFecTransaccion(fecha);
 				
 				response= new Response<>(false, 200, EXITO, comPagoResponse);
 				
