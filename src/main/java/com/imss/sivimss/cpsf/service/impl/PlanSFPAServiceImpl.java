@@ -42,6 +42,9 @@ import com.imss.sivimss.cpsf.utils.NumeroAPalabra;
 import com.imss.sivimss.cpsf.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.cpsf.utils.Response;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class PlanSFPAServiceImpl implements PlanSFPAService {
 	
@@ -184,6 +187,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			UsuarioDto user = datosUtil.getUserData(authentication);
 			
 			planSFPARequest.setIdUsuario(user.getIdUsuario());
+		    log.info(""+user.getIdUsuario());
 
 			PlanSFPAMapper planSFPAMapper = session.getMapper(PlanSFPAMapper.class);
 			
@@ -245,6 +249,10 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			
 				
 					response = this.getReporte(planSFPARequest.getIdPlanSfpa(), authentication, planSFPAMapper);
+					 Map<String, Object> respuestaMap = new HashMap<>();  
+					 respuestaMap.put("id", planSFPARequest.getIdPlanSfpa());
+					 respuestaMap.put("reporte", response.getDatos().toString());
+					 response.setDatos(respuestaMap);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
 					session.commit();
 				 
