@@ -216,7 +216,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 						}
 						if(planSFPARequest.getTitularesBeneficiarios().size() == 3 ) {
 							//planSFPARequest.setSubtitular(planSFPARequest.getTitularesBeneficiarios().get(1).getIdTitularBeneficiarios());
-							planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario1());
+							planSFPARequest.setBeneficiario1(planSFPARequest.getTitularesBeneficiarios().get(1).getIdBeneficiario1());
 							planSFPARequest.setBeneficiario2(planSFPARequest.getTitularesBeneficiarios().get(2).getIdBeneficiario2());	
 						}
 				}
