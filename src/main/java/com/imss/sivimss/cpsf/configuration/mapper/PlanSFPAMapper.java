@@ -157,18 +157,49 @@ public interface PlanSFPAMapper {
 			+ "SEPS.ID_ESTATUS_PLAN_SFPA  = SPSFPA.ID_ESTATUS_PLAN_SFPA INNER JOIN SVT_PAQUETE paq on SPSFPA.ID_PAQUETE = paq.ID_PAQUETE WHERE SPSFPA.ID_PLAN_SFPA = #{idPlanSfpa} AND SPSFPA.IND_ACTIVO = 1")
 	public DetallePlanSFPAResponse selectVerdetallePlanSFPA(Integer idPlanSfpa);
 	
-	@Select("select pg.idPagoSFPA, pg.idEstatus, CONCAT(cast((@ROW := @ROW + 1) as VARCHAR(255)), '/', ( select COUNT(pf.ID_PAGO_SFPA) from SVT_PAGO_SFPA pf where pf.IND_ACTIVO = 1 and pf.ID_PLAN_SFPA = pg.idPlanSFPA)) as noPagos, "
-			+ "pg.idPlanSFPA, pg.velatorio, DATE_FORMAT(pg.fechaParcialidad, '%d/%m/%Y') as fechaParcialidad, pg.importeMensual, pg.estatusPago, pg.importePagado, case when pg.importePagado < pg.importeMensual && pg.fechaParcialidad = CURDATE() "
-			+ "then true when pg.importePagado = pg.importeMensual then false else false end as validaPago, pg.importePagado , pg.importeMensual , pg.fechaParcialidad , case when pg.idEstatus = 2 then 0 when month(pg.fechaParcialidad) = month(CURDATE()) "
-			+ "&& ((pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora) > 0 then (pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora when pg.importeMensual - pg.importePagado > 0 then pg.importeMensual - pg.importePagado "
-			+ "else pg.importeMensual end as importeAcumulado, pg.folioRecibo, (select GROUP_CONCAT(sm.DES_METODO_PAGO) from SVC_BITACORA_PAGO_ANTICIPADO bp inner join SVC_METODO_PAGO sm on bp.ID_METODO_PAGO = sm.ID_METODO_PAGO "
-			+ "where bp.IND_ACTIVO = 1 and bp.ID_PAGO_SFPA = pg.idPagoSFPA) as metodoPago from ( select ps.ID_PAGO_SFPA as idPagoSFPA, ps.ID_PLAN_SFPA as idPlanSFPA, ps.ID_ESTATUS_PAGO as idEstatus, v.DES_VELATORIO as velatorio,"
-			+ " ps.FEC_PARCIALIDAD as fechaParcialidad, ps.IMP_MONTO_MENSUAL as importeMensual, ep.DES_ESTATUS_PAGO_ANTICIPADO as estatusPago, ( select (IFNULL(SUM(bpa.IMP_PAGO), 0) + IFNULL(SUM(bpa.IMP_AUTORIZADO_VALE_PARITARIO), 0)) "
-			+ "from SVC_BITACORA_PAGO_ANTICIPADO bpa where bpa.IND_ACTIVO = 1 and bpa.ID_PAGO_SFPA = ps.ID_PAGO_SFPA) as importePagado, ps.IND_ACTIVO, ( select IFNULL(SUM(sps.IMP_MONTO_MENSUAL), 0) from SVT_PAGO_SFPA sps where "
-			+ "sps.ID_ESTATUS_PAGO = 2 and sps.IND_ACTIVO = 1 and sps.FEC_PARCIALIDAD <= CURDATE() and sps.ID_PLAN_SFPA = ps.ID_PLAN_SFPA) as importeFaltante, ( select IFNULL(SUM(bpaa.IMP_PAGO), 0) + IFNULL(SUM(bpaa.IMP_AUTORIZADO_VALE_PARITARIO), 0) "
-			+ "from SVT_PAGO_SFPA sps join SVC_BITACORA_PAGO_ANTICIPADO bpaa on bpaa.ID_PAGO_SFPA = sps.ID_PAGO_SFPA and bpaa.IND_ACTIVO = 1 where sps.IND_ACTIVO = 1 and sps.ID_PLAN_SFPA = ps.ID_PLAN_SFPA) as importePagadoBitacora, ps.IMP_MONTO_MENSUAL, "
-			+ "IFNULL(ps.REF_FOLIO_RECIBO, '') as folioRecibo from SVT_PAGO_SFPA ps join SVT_PLAN_SFPA pls on pls.ID_PLAN_SFPA = ps.ID_PLAN_SFPA join SVC_VELATORIO v on v.ID_VELATORIO = pls.ID_VELATORIO join SVC_ESTATUS_PAGO_ANTICIPADO ep on "
-			+ "ep.ID_ESTATUS_PAGO_ANTICIPADO = ps.ID_ESTATUS_PAGO) as pg, ( select @ROW := 0) r where pg.idPlanSFPA = #{idPlanSfpa} and pg.IND_ACTIVO = 1")
+	@Select("SELECT pg.idPagoSFPA,pg.idEstatus, CONCAT(CAST((@ROW := @ROW + 1) AS VARCHAR(255)),'/', ( " +
+            " SELECT COUNT(pf.ID_PAGO_SFPA) " +
+            " FROM SVT_PAGO_SFPA pf " +
+            " WHERE pf.IND_ACTIVO = 1 AND pf.ID_PLAN_SFPA = pg.idPlanSFPA)) AS noPagos,  " +
+            " pg.idPlanSFPA, pg.velatorio, DATE_FORMAT(pg.fechaParcialidad,'%d/%m/%Y') AS fechaParcialidad,  " +
+            " pg.importeMensual, pg.estatusPago, pg.importePagado,  " +
+            " CASE WHEN pg.importePagado < pg.importeMensual && pg.fechaParcialidad = CURDATE() THEN TRUE  " +
+            " WHEN pg.importePagado = pg.importeMensual THEN FALSE " +
+            " ELSE FALSE END AS validaPago,  " +
+            " pg.importePagado , pg.importeMensual , " +
+            " pg.fechaParcialidad , " +
+            " CASE WHEN pg.idEstatus = 2 THEN 0 WHEN MONTH(pg.fechaParcialidad) = MONTH(CURDATE()) && ((pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora) > 0  "
+            +
+            " THEN (pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora " +
+            " when pg.importeMensual - pg.importePagado  > 0 " +
+            " then  pg.importeMensual - pg.importePagado " +
+            " ELSE pg.importeMensual END AS importeAcumulado, pg.folioRecibo " +
+            " FROM ( " +
+            " SELECT ps.ID_PAGO_SFPA AS idPagoSFPA, ps.ID_PLAN_SFPA AS idPlanSFPA,ps.ID_ESTATUS_PAGO AS idEstatus, v.DES_VELATORIO AS velatorio, ps.FEC_PARCIALIDAD AS fechaParcialidad, ps.IMP_MONTO_MENSUAL AS importeMensual, ep.DES_ESTATUS_PAGO_ANTICIPADO AS estatusPago, ( "
+            +
+            " SELECT " +
+            " (IFNULL(SUM(bpa.IMP_PAGO),0) + IFNULL(SUM(bpa.IMP_AUTORIZADO_VALE_PARITARIO),0)) " +
+            " FROM SVC_BITACORA_PAGO_ANTICIPADO bpa " +
+            " WHERE bpa.IND_ACTIVO = 1 AND bpa.ID_PAGO_SFPA = ps.ID_PAGO_SFPA) AS importePagado, ps.IND_ACTIVO, ( "
+            +
+            " SELECT IFNULL(SUM(sps.IMP_MONTO_MENSUAL),0) " +
+            " FROM SVT_PAGO_SFPA sps" +
+            " WHERE sps.ID_ESTATUS_PAGO = 2 AND sps.IND_ACTIVO = 1 AND sps.FEC_PARCIALIDAD <= CURDATE() AND sps.ID_PLAN_SFPA = ps.ID_PLAN_SFPA) AS importeFaltante, ( "
+            +
+            " SELECT IFNULL(SUM(bpaa.IMP_PAGO),0)  + IFNULL(SUM(bpaa.IMP_AUTORIZADO_VALE_PARITARIO),0) " +
+            " FROM SVT_PAGO_SFPA sps" +
+            " JOIN SVC_BITACORA_PAGO_ANTICIPADO bpaa ON bpaa.ID_PAGO_SFPA= sps.ID_PAGO_SFPA " +
+            " AND bpaa.IND_ACTIVO = 1  " +
+            " WHERE sps.IND_ACTIVO = 1 AND sps.ID_PLAN_SFPA = ps.ID_PLAN_SFPA) AS importePagadoBitacora, ps.IMP_MONTO_MENSUAL, "
+            +
+            " IFNULL(ps.REF_FOLIO_RECIBO,'') as folioRecibo " +
+            " FROM SVT_PAGO_SFPA ps " +
+            " JOIN SVT_PLAN_SFPA pls ON pls.ID_PLAN_SFPA = ps.ID_PLAN_SFPA " +
+            " JOIN SVC_VELATORIO v ON v.ID_VELATORIO = pls.ID_VELATORIO " +
+            " JOIN SVC_ESTATUS_PAGO_ANTICIPADO ep ON ep.ID_ESTATUS_PAGO_ANTICIPADO = ps.ID_ESTATUS_PAGO) AS pg, ( "
+            +
+            " SELECT @ROW := 0) r " +
+            " WHERE pg.idPlanSFPA = #{idPlanSfpa} AND pg.IND_ACTIVO = 1")
 	public List<PagoSFPAResponse> selectVerdetallePagoSFPA(Integer idPlanSfpa);
 	
 	@Select("SELECT TIP_PARAMETRO AS imgCheck FROM SVC_PARAMETRO_SISTEMA sps WHERE sps.ID_FUNCIONALIDAD = 25 AND sps.DES_PARAMETRO = 'IMAGEN_CHECK'")
