@@ -225,7 +225,8 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				planSFPARequest.setNumFolioPlanSfpa(planSFPAMapper.selectnumFolioPlanSfpa(planSFPARequest.getIdVelatorio(), planSFPARequest.getIdPaquete(), planSFPARequest.getIdTipoPagoMensual()));
 		
 				planSFPAMapper.insertarPlanSfpa(planSFPARequest);
-				
+				Integer idPagoMensual=0;
+				String pagoMensual=null;
 				for (int i = 0; i < planSFPARequest.getNumPagoMensual(); i++) {
 					//LocalDate fechaActual = LocalDate.now();
 					//LocalDate fechafinal = fechaActual.plusMonths(i);
@@ -236,6 +237,13 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 					//pago.setFecParcialidad("DATE_ADD(CURDATE(), INTERVAL " +i+" MONTH)");
 					pago.setI(i);
 					pago.setIdUsuario(user.getIdUsuario());
+					
+					
+					if (i==0) {
+						idPagoMensual=planSFPAMapper.insertarPagosfpa(pago);
+						pagoMensual=pago.getMonMensual().toString();
+						continue;
+					}
 					
 					planSFPAMapper.insertarPagosfpa(pago);
 				}
@@ -252,6 +260,8 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 					 Map<String, Object> respuestaMap = new HashMap<>();  
 					 respuestaMap.put("id", planSFPARequest.getIdPlanSfpa());
 					 respuestaMap.put("reporte", response.getDatos().toString());
+					 respuestaMap.put("idPagoMensual", idPagoMensual);
+					 respuestaMap.put("pagoMensual", pagoMensual);
 					 response.setDatos(respuestaMap);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
 					session.commit();
