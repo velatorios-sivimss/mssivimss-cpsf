@@ -240,7 +240,8 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 					
 					
 					if (i==0) {
-						idPagoMensual=planSFPAMapper.insertarPagosfpa(pago);
+						planSFPAMapper.insertarPagosfpa(pago);
+						idPagoMensual=pago.getIdPagoSfpa();
 						pagoMensual=pago.getMonMensual().toString();
 						continue;
 					}
