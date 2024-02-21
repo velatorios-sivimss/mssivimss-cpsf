@@ -84,8 +84,10 @@ public interface PagoSFPAMapper {
 			+ "WHERE ID_PAGO_SFPA =#{idPagoSFPA}\r\n"
 			+ "AND ID_PLAN_SFPA = #{idPlanSFPA}"
 			)
-	public int actualizarFolioPago( @Param("idUsuario")Integer idUsuario, 
-			@Param("idPagoSFPA")Integer idPagoSFPA, @Param("idPlanSFPA")Integer idPlanSFPA);
+	public int actualizarFolioPago( 
+			@Param("idUsuario")Integer idUsuario, 
+			@Param("idPagoSFPA")Integer idPagoSFPA, 
+			@Param("idPlanSFPA")Integer idPlanSFPA);
 	
 	@Update(value = ""
 			+ "UPDATE \r\n"

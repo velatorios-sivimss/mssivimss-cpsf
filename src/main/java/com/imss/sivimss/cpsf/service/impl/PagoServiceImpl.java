@@ -347,7 +347,7 @@ public class PagoServiceImpl implements PagoService {
             	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
 						this.getClass().getPackage().toString(), "","costo restante es 0", authentication);
                 estatusPagoSFPA = 5;// 5 pagado
-                pagoSFPAMapper.actualizarFolioPago(pago.getIdPagoSFPA(), pago.getIdRegistro(), pago.getIdUsuario());
+                pagoSFPAMapper.actualizarFolioPago(pago.getIdUsuario(), pago.getIdPagoSFPA(), pago.getIdRegistro());
             }
             
             if (costoRestante == -1.0)
