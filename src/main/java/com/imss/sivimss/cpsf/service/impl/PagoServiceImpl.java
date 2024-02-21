@@ -73,6 +73,7 @@ public class PagoServiceImpl implements PagoService {
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		String impresion;
+		SqlSession session = sqlSessionFactory.openSession();
 		
 		pago.setIdUsuario( usuarioDto.getIdUsuario() );
 		pago.setIdPlataforma( PLATAFORMA_LINEA );
@@ -100,7 +101,7 @@ public class PagoServiceImpl implements PagoService {
 		 * La trydeclaración -with-resources es una trydeclaración que declara uno 
 		 * o más recursos. Un recurso es un objeto que debe cerrarse una vez finalizado el programa.
 		 * */
-		try (SqlSession session = sqlSessionFactory.openSession()) {
+		try  {
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -108,42 +109,27 @@ public class PagoServiceImpl implements PagoService {
 			 * configuration.addMapper(NombreDeMiMapper.class);)
 			 */
 			PagoLineaMapper pagoLineaMapper = session.getMapper(PagoLineaMapper.class);
-
-			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				
-				pagoLineaMapper.nuevoRegistroObj(pago);
-				//response= new Response<>(false, 200, EXITO, pago);
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-	        	logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al guardar el pago en Linea", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
+			pagoLineaMapper.nuevoRegistroObj(pago);
 			session.commit();
-			session.close();
+			
+			
+		}catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+        	logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al guardar el pago en Linea", authentication);
+			
+			session.rollback();
+			
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
+		
+		session.close();
 		
 		impresion = gson.toJson(pago);
 		
@@ -196,11 +182,12 @@ public class PagoServiceImpl implements PagoService {
 		Response<Object> response = null;
 		ComPagoResponse comPagoResponse;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		SqlSession session = sqlSessionFactory.openSession();
 		
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
 				this.getClass().getPackage().toString(), "","Id a Buscar: " + idPagoLinea, authentication);
 		
-		try (SqlSession session = sqlSessionFactory.openSession()) {
+		try {
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -208,45 +195,30 @@ public class PagoServiceImpl implements PagoService {
 			 * configuration.addMapper(NombreDeMiMapper.class);)
 			 */
 			PagoLineaMapper pagoLineaMapper = session.getMapper(PagoLineaMapper.class);
-			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				
-				comPagoResponse = pagoLineaMapper.selectDatos( formatoFechaHora, idPagoLinea);
-				String fecha = comPagoResponse.getFecTransaccion().replaceAll("\"", "");
-				comPagoResponse.setFecTransaccion(fecha);
-				
-				response= new Response<>(false, 200, EXITO, comPagoResponse);
-				
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar el pago: ", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
+			comPagoResponse = pagoLineaMapper.selectDatos( formatoFechaHora, idPagoLinea);
+			String fecha = comPagoResponse.getFecTransaccion().replaceAll("\"", "");
+			comPagoResponse.setFecTransaccion(fecha);
 			session.commit();
-			session.close();
+			
+			response= new Response<>(false, 200, EXITO, comPagoResponse);
+			
+			
+		} catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar el pago: ", authentication);
+			
+			session.rollback();
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
+		
+		session.close();
 		
 		return response;
 	}
@@ -257,8 +229,9 @@ public class PagoServiceImpl implements PagoService {
 		Response<Object> response = null;
 		ConPFResponse conPF;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		try (SqlSession session = sqlSessionFactory.openSession()) {
+		try{
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -268,48 +241,32 @@ public class PagoServiceImpl implements PagoService {
 			ConvenioPFMapper convenioPFMapper = session.getMapper(ConvenioPFMapper.class);
 			PagoBitacoraMapper pagoBitacoraMapper = session.getMapper(PagoBitacoraMapper.class);
 			PagoDetalleMapper pagoDetalleMapper = session.getMapper(PagoDetalleMapper.class);
-			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				
-				conPF = convenioPFMapper.selectDatos( pago.getIdRegistro() );
-				pagoBitacora.setFechaRegistro( conPF.getFecInicio() );
-				pagoBitacoraMapper.nuevoRegistroObj( pagoBitacora );
-				pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
-				pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
-				convenioPFMapper.actualizarRegistroObj( pago.getIdRegistro(), pago.getIdUsuario());
-				
-				response= new Response<>(false, 200, EXITO, pago);
-				
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear el Convenio PF: ", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
+			conPF = convenioPFMapper.selectDatos( pago.getIdRegistro() );
+			pagoBitacora.setFechaRegistro( conPF.getFecInicio() );
+			pagoBitacoraMapper.nuevoRegistroObj( pagoBitacora );
+			pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
+			pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
+			convenioPFMapper.actualizarRegistroObj( pago.getIdRegistro(), pago.getIdUsuario());
 			session.commit();
-			session.close();
+			response= new Response<>(false, 200, EXITO, pago);
+			
+			
+		}catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear el Convenio PF: ", authentication);
+			
+			session.rollback();
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
+		
+		session.close();
 		
 		return response;
 	}
@@ -320,8 +277,9 @@ public class PagoServiceImpl implements PagoService {
 		Response<Object> response = null;
 		RenConPFResponse renConPF;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		try (SqlSession session = sqlSessionFactory.openSession()) {
+		try {
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -331,49 +289,30 @@ public class PagoServiceImpl implements PagoService {
 			RenConvenioPFMapper renConvenioPFMapper = session.getMapper(RenConvenioPFMapper.class);
 			PagoBitacoraMapper pagoBitacoraMapper = session.getMapper(PagoBitacoraMapper.class);
 			PagoDetalleMapper pagoDetalleMapper = session.getMapper(PagoDetalleMapper.class);
-			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				
-				renConPF = renConvenioPFMapper.selectDatos( pago.getIdRegistro() );
-				pagoBitacora.setFechaRegistro( renConPF.getFecInicio() );
-				pagoBitacoraMapper.nuevoRegistroObj( pagoBitacora );
-				pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
-				pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
-				renConvenioPFMapper.actualizarRegistroObj( pago.getIdRegistro(), pago.getIdUsuario());
-				
-				response= new Response<>(false, 200, EXITO, pago);
-				
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear la Renovacion del Convenio PF: ", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
+			renConPF = renConvenioPFMapper.selectDatos( pago.getIdRegistro() );
+			pagoBitacora.setFechaRegistro( renConPF.getFecInicio() );
+			pagoBitacoraMapper.nuevoRegistroObj( pagoBitacora );
+			pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
+			pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
+			renConvenioPFMapper.actualizarRegistroObj( pago.getIdRegistro(), pago.getIdUsuario());
 			session.commit();
-			session.close();
+			
+		}catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear la Renovacion del Convenio PF: ", authentication);
+			
+			session.rollback();
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
 		
+		session.close();
 		return response;
 		
 	}
@@ -382,8 +321,10 @@ public class PagoServiceImpl implements PagoService {
 		
 		Response<Object> response = null;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		SqlSession session = sqlSessionFactory.openSession();
 		
-		try (SqlSession session = sqlSessionFactory.openSession()) {
+		
+		try {
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -392,83 +333,68 @@ public class PagoServiceImpl implements PagoService {
 			 */
 			BitacoraPAMapper bitacoraPAMapper = session.getMapper(BitacoraPAMapper.class);
 			PagoSFPAMapper pagoSFPAMapper = session.getMapper(PagoSFPAMapper.class);
+			bitacoraPAMapper.nuevoRegistroObj( pago );
+			Double costoRestante = validaCosto( pago.getIdRegistro(), authentication );
 			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				bitacoraPAMapper.nuevoRegistroObj( pago );
-				Double costoRestante = validaCosto( pago.getIdRegistro(), authentication );
-				
-				
-				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
-						this.getClass().getPackage().toString(), "","El costo restante es: " + costoRestante, authentication);
+			
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+					this.getClass().getPackage().toString(), "","El costo restante es: " + costoRestante, authentication);
 
-	            Integer estatusPagoSFPA = 8;// 8 estatus por pagar
+            Integer estatusPagoSFPA = 8;// 8 estatus por pagar
 
-	            if (costoRestante == 0 || costoRestante == 0.0) {
-	                
-	            	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
-							this.getClass().getPackage().toString(), "","costo restante es 0", authentication);
-	                estatusPagoSFPA = 5;// 5 pagado
-	                pagoSFPAMapper.actualizarFolioPago(pago.getIdPagoSFPA(), pago.getIdRegistro(), pago.getIdUsuario());
-	            }
-	            
-	            if (costoRestante == -1.0)
-	                return new Response<>(false, 500, "Error al buscar los costos", null);
+            if (costoRestante == 0 || costoRestante == 0.0) {
+                
+            	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+						this.getClass().getPackage().toString(), "","costo restante es 0", authentication);
+                estatusPagoSFPA = 5;// 5 pagado
+                pagoSFPAMapper.actualizarFolioPago(pago.getIdPagoSFPA(), pago.getIdRegistro(), pago.getIdUsuario());
+            }
+            
+            if (costoRestante == -1.0)
+                return new Response<>(false, 500, "Error al buscar los costos", null);
 
-	            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
-						this.getClass().getPackage().toString(), "","el estatus de pago es " + estatusPagoSFPA, authentication);
-	            
-	            pagoSFPAMapper.actualizaEstatusPagoSFPA(pago, estatusPagoSFPA);
-	            
-	            Double total = validaTotalPagado( pago.getIdRegistro(), authentication );
-	            
-	            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
-						this.getClass().getPackage().toString(), "","El total es: " + total, authentication);
-	            
-	            Integer estatusPlan = 2;// esatus plan 2 vigente
-	            if (total <= 0.0)
-	                estatusPlan = 4;// esatus plan 4 pagado
-	            
-	            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
-						this.getClass().getPackage().toString(), "","Total pagado: " + total, authentication);
-	            
-	            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
-						this.getClass().getPackage().toString(), "","Estatus Plan: " + estatusPlan, authentication);
-	            
-	            pagoSFPAMapper.actualizaEstatusPlan(pago, estatusPlan);
-	            
-				response= new Response<>(false, 200, EXITO, pago);
-				
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear Pagos Anticipados: ", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
-			session.commit();
-			session.close();
+            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+					this.getClass().getPackage().toString(), "","el estatus de pago es " + estatusPagoSFPA, authentication);
+            
+            pagoSFPAMapper.actualizaEstatusPagoSFPA(pago, estatusPagoSFPA);
+            
+            Double total = validaTotalPagado( pago.getIdRegistro(), authentication );
+            
+            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+					this.getClass().getPackage().toString(), "","El total es: " + total, authentication);
+            
+            Integer estatusPlan = 2;// esatus plan 2 vigente
+            if (total <= 0.0)
+                estatusPlan = 4;// esatus plan 4 pagado
+            
+            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+					this.getClass().getPackage().toString(), "","Total pagado: " + total, authentication);
+            
+            logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
+					this.getClass().getPackage().toString(), "","Estatus Plan: " + estatusPlan, authentication);
+            
+            pagoSFPAMapper.actualizaEstatusPlan(pago, estatusPlan);
+            session.commit();
+            
+			response= new Response<>(false, 200, EXITO, pago);
+			
+			
+		}catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al crear Pagos Anticipados: ", authentication);
+			
+			session.rollback();
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
 		
+		session.close();
 		return response;
 	}
 
@@ -499,8 +425,9 @@ public class PagoServiceImpl implements PagoService {
         List<CostoResponse> costos = null;
         
         SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		
-		try (SqlSession session = sqlSessionFactory.openSession()) {
+        SqlSession session = sqlSessionFactory.openSession();
+        
+		try {
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -508,41 +435,25 @@ public class PagoServiceImpl implements PagoService {
 			 * configuration.addMapper(NombreDeMiMapper.class);)
 			 */
 			PagoSFPAMapper pagoSFPAMapper = session.getMapper(PagoSFPAMapper.class);
-			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				costos = pagoSFPAMapper.validaMontoPagoSFPA(idPlan);
-				
-				
-				
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar los costos: ", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
+			costos = pagoSFPAMapper.validaMontoPagoSFPA(idPlan);
 			session.commit();
-			session.close();
+			
+		}catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar los costos: ", authentication);
+			
+			session.rollback();
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
+		
+		session.close();
 
             if ( (costos!=null) && 
             		(costos.size() > 0)  
@@ -595,8 +506,9 @@ public class PagoServiceImpl implements PagoService {
 
         Double total = 0.0;
         SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+        SqlSession session = sqlSessionFactory.openSession();
         
-        try (SqlSession session = sqlSessionFactory.openSession()) {
+        try {
 			
 			/* 
 			 * Debemos indicar cual o cuales Mapper vamos a utilizar
@@ -604,40 +516,25 @@ public class PagoServiceImpl implements PagoService {
 			 * configuration.addMapper(NombreDeMiMapper.class);)
 			 */
 			PagoSFPAMapper pagoSFPAMapper = session.getMapper(PagoSFPAMapper.class);
-			
-			try {
-				/* 
-				 * Para sentencias que actualizan datos o crean nuevos usaremos un try-catch
-				 * 1._ accedemos al metodo de nuestro objeto mapper 
-				 * 2._ Ejecutamos un commit para ver los cambios reflejados en BD
-				 * 3._ Seteamos la data que vamos a devolver como respuesta
-				 *  */
-				total = pagoSFPAMapper.totalPagado(idPlan);
-				
-			} catch (Exception e) {
-				/*
-				 * Para el escenario en que fallen las querys
-				 * 
-				 * 1._ Realizamos un roll back (regresamos los cambios)
-				 * 2._ Cerramos la conexión.
-				 * */
-				
-				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
-	        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar los costos: ", authentication);
-				
-				session.rollback();
-				session.close();
-				throw new IOException(ERROR_INFORMACION, e.getCause());
-			}
-			/* 
-			 * Aunque Mybatis se encarga de cerrar las conexiones en automatico y 
-			 * La trydeclaración -with-resources cierra los recursos en automático, 
-			 * nunca esta de más cerrar manualmente la conexión 
-			 */
+			total = pagoSFPAMapper.totalPagado(idPlan);
 			session.commit();
-			session.close();
+			
+		}catch (Exception e) {
+			/*
+			 * Para el escenario en que fallen las querys
+			 * 
+			 * 1._ Realizamos un roll back (regresamos los cambios)
+			 * 2._ Cerramos la conexión.
+			 * */
+			
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), 
+        			this.getClass().getPackage().toString(), e.getMessage(), "Error al buscar los costos: ", authentication);
+			
+			session.rollback();
+			throw new IOException(ERROR_INFORMACION, e.getCause());
 		}
         
+        session.close();
         return total;
 
     }
