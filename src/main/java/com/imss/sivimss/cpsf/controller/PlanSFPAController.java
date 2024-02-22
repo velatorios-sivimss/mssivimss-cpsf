@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -126,6 +127,15 @@ public class PlanSFPAController {
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@GetMapping("/consulta-detalle-linea-plan-sfpa/contratante/{idVelatorio}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenericoConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenericoConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaDatosContratante(@PathVariable(required = true) Integer idVelatorio, Authentication authentication)	throws Throwable {
+		Response<Object> response = planSFPAService.consultaDetallePlanSfpaContratante(idVelatorio,authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 	/**
 	 * fallbacks generico
 	 * 
@@ -152,6 +162,14 @@ public class PlanSFPAController {
 			NumberFormatException e) throws Throwable {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),RESILENCIA, INSERT,authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	CompletableFuture<Object> fallbackGenericoConsulta(@PathVariable(required = true) Integer idVelatorio, Authentication authentication,
+			CallNotPermittedException e) throws Throwable {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),RESILENCIA, CONSULTA,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}

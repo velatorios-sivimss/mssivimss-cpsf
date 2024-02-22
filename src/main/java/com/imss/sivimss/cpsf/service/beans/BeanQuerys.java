@@ -308,4 +308,52 @@ public class BeanQuerys {
 		return query.toString();
 	}
 	
+	public String detallePlanSFPAContratante(Integer idVelatorio, Integer idContratante) {
+		String consulta="SELECT\r\n"
+				+ "	c.ID_CONTRATANTE AS idContratante,   \r\n"
+				+ "			 c.ID_PERSONA AS idPersona,\r\n"
+				+ "	c.ID_DOMICILIO AS idDomicilio,  \r\n"
+				+ "			 ifnull(p.CVE_RFC, '') AS rfc,\r\n"
+				+ "	p.CVE_CURP AS curp,\r\n"
+				+ "	p.CVE_NSS AS nss,   \r\n"
+				+ "			 p.NOM_PERSONA AS nombre,\r\n"
+				+ "	p.NOM_PRIMER_APELLIDO AS primerApellido,  \r\n"
+				+ "			 p.NOM_SEGUNDO_APELLIDO AS segundoApellido,  \r\n"
+				+ "			 ifnull(c.CVE_MATRICULA, '') as matricula, \r\n"
+				+ "			 p.NUM_SEXO AS idSexo,   \r\n"
+				+ "			 case\r\n"
+				+ "		when p.NUM_SEXO = 1 then 'Mujer'\r\n"
+				+ "		when p.NUM_SEXO = 2 then 'Hombre'\r\n"
+				+ "		ELSE 'Otro'\r\n"
+				+ "	END sexo,  \r\n"
+				+ "			 ifnull(p.REF_OTRO_SEXO, '') AS otroSexo,   \r\n"
+				+ "			 DATE_FORMAT(p.FEC_NAC, '%d-%m-%Y') AS fechaNacimiento,  \r\n"
+				+ "			 p.ID_ESTADO AS idEstado,  \r\n"
+				+ "			 p.REF_TELEFONO AS telefono,  \r\n"
+				+ "			 p.REF_CORREO AS correo,  \r\n"
+				+ "			 p.TIP_PERSONA AS tipoPersona,  \r\n"
+				+ "			 e.DES_ESTADO AS estado , \r\n"
+				+ "			 c.ID_DOMICILIO AS idDomicilio, \r\n"
+				+ "			(\r\n"
+				+ "	SELECT\r\n"
+				+ "		d.DES_DELEGACION\r\n"
+				+ "	FROM\r\n"
+				+ "		SVC_VELATORIO v\r\n"
+				+ "	JOIN SVC_DELEGACION d ON\r\n"
+				+ "		d.ID_DELEGACION = v.ID_DELEGACION\r\n"
+				+ "	WHERE\r\n"
+				+ "		v.ID_VELATORIO = "+idVelatorio+") AS delegacion , \r\n"
+				+ "			 DATE_FORMAT(DATE_ADD( CURDATE(), INTERVAL 1 DAY), '%d-%m-%Y') AS fecha\r\n"
+				+ "FROM\r\n"
+				+ "	SVC_CONTRATANTE c\r\n"
+				+ "JOIN SVC_PERSONA p ON\r\n"
+				+ "	p.ID_PERSONA = c.ID_PERSONA\r\n"
+				+ "LEFT JOIN SVC_ESTADO e ON\r\n"
+				+ "	e.ID_ESTADO = p.ID_ESTADO\r\n"
+				+ "WHERE\r\n"
+				+ "	c.ID_CONTRATANTE = "+idContratante;
+		log.info(consulta);
+		return consulta;
+	}
+	
 }

@@ -2,8 +2,6 @@ package com.imss.sivimss.cpsf.service.impl;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.imss.sivimss.cpsf.configuration.MyBatisConfig;
 import com.imss.sivimss.cpsf.configuration.mapper.Consultas;
 import com.imss.sivimss.cpsf.configuration.mapper.PlanSFPAMapper;
@@ -26,7 +25,6 @@ import com.imss.sivimss.cpsf.model.request.Contratante;
 import com.imss.sivimss.cpsf.model.request.PagoSFPA;
 import com.imss.sivimss.cpsf.model.request.PlanSFPA;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
-import com.imss.sivimss.cpsf.model.response.ContratanteResponse;
 import com.imss.sivimss.cpsf.model.response.PagoSFPAResponse;
 import com.imss.sivimss.cpsf.model.response.PaqueteResponse;
 import com.imss.sivimss.cpsf.model.response.PersonaResponse;
@@ -37,7 +35,6 @@ import com.imss.sivimss.cpsf.service.beans.BeanQuerys;
 import com.imss.sivimss.cpsf.utils.AppConstantes;
 import com.imss.sivimss.cpsf.utils.DatosRequestUtil;
 import com.imss.sivimss.cpsf.utils.GeneraCredencialesUtil;
-import com.imss.sivimss.cpsf.utils.MensajeResponseUtil;
 import com.imss.sivimss.cpsf.utils.NumeroAPalabra;
 import com.imss.sivimss.cpsf.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.cpsf.utils.Response;
@@ -76,6 +73,10 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 	
     private	List<Map<String, Object>> servicios = new ArrayList<>();
 	private int i;
+	
+	private Gson gson = new Gson();
+	
+	private UsuarioDto usuario;
 
 	@Override
 	public Response<Object> consultaDetallePlanSfpa(String cveUsuario) {
@@ -501,6 +502,22 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		}
 		
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, planSFPAResponse);
+	}
+
+	@Override
+	public Response<Object> consultaDetallePlanSfpaContratante(Integer idVelatorio, Authentication authentication)
+			throws IOException, SQLException {
+		
+		usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		List<Map<String, Object>> result = new ArrayList<>();
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
+		try(SqlSession session = sqlSessionFactory.openSession()) {
+			Consultas consultas = session.getMapper(Consultas.class);
+			result = consultas.selectNativeQuery(query.detallePlanSFPAContratante(idVelatorio,usuario.getIdContratante()));
+		}
+		
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
 	}
 
 }

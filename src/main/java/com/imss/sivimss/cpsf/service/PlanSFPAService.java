@@ -34,5 +34,7 @@ public interface PlanSFPAService {
 	Response<Object> generaReporteConvenioPagoAnticipado(Integer idPlanSfpa, Authentication authentication);
 	
 	Response<Object>  verDetallePlanSfpa(Integer idPlanSfpa) throws IOException, SQLException;
+	
+	Response<Object>  consultaDetallePlanSfpaContratante(Integer idVelatorio, Authentication authentication) throws IOException, SQLException;
 
 }
