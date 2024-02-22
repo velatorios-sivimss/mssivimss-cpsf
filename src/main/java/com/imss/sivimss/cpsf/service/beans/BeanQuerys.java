@@ -1,5 +1,7 @@
 package com.imss.sivimss.cpsf.service.beans;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.cpsf.model.request.Contratante;
@@ -12,6 +14,9 @@ import com.imss.sivimss.cpsf.utils.SelectQueryUtil;
 
 @Service
 public class BeanQuerys {
+
+	
+	private static final Logger log = LoggerFactory.getLogger(BeanQuerys.class);
 
 	public String queryGetArticulos() {
 		return "SELECT DISTINCT "
@@ -104,8 +109,10 @@ public class BeanQuerys {
 		.innerJoin("SVT_USUARIOS SU", "SU.ID_PERSONA = SP.ID_PERSONA").innerJoin(ConsultaConstantes.SVT_DOMICILIO_SD, "SD.ID_DOMICILIO = SC.ID_DOMICILIO")
 		.leftJoin("SVT_TITULAR_BENEFICIARIOS STB2", "STB2.ID_TITULAR_BENEFICIARIOS = SPSFPA.ID_TITULAR_SUBSTITUTO")
 		.leftJoin("SVC_PERSONA SP2", "SP2.ID_PERSONA = STB2.ID_PERSONA").leftJoin("SVT_DOMICILIO SD2", "SD2.ID_DOMICILIO = STB2.ID_DOMICILIO")
-		.innerJoin(ConsultaConstantes.SVC_VELATORIO_SV, "SV.ID_VELATORIO = SPSFPA.ID_VELATORIO").where("SU.CVE_USUARIO = :cveUsuario").setParameter("cveUsuario", cveUsuario);
-		return queryUtil.build();
+		.innerJoin(ConsultaConstantes.SVC_VELATORIO_SV, "SV.ID_VELATORIO = SPSFPA.ID_VELATORIO").where("SU.CVE_USUARIO = :cveUsuario").setParameter("cveUsuario", cveUsuario).groupBy("SPSFPA.ID_PLAN_SFPA");
+		String consulta =queryUtil.build();
+		log.info(consulta);
+		return consulta;
 	}
 	
 	public String consultaTipoContratacion() {
