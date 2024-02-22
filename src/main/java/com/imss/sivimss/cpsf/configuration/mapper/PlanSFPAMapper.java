@@ -161,19 +161,25 @@ public interface PlanSFPAMapper {
             " SELECT COUNT(pf.ID_PAGO_SFPA) " +
             " FROM SVT_PAGO_SFPA pf " +
             " WHERE pf.IND_ACTIVO = 1 AND pf.ID_PLAN_SFPA = pg.idPlanSFPA)) AS noPagos,  " +
-            " pg.idPlanSFPA, pg.velatorio, DATE_FORMAT(pg.fechaParcialidad,'%d/%m/%Y') AS fechaParcialidad,  " +
+            " pg.idPlanSFPA, pg.velatorio, DATE_FORMAT(pg.fechaParcialidad,'%d/%m/%Y') AS fechaParcialidad,  "
+            +
             " pg.importeMensual, pg.estatusPago, pg.importePagado,  " +
-            " CASE WHEN pg.importePagado < pg.importeMensual && pg.fechaParcialidad = CURDATE() THEN TRUE  " +
+            " CASE WHEN pg.importePagado < pg.importeMensual && pg.fechaParcialidad = CURDATE() THEN TRUE  "
+            +
             " WHEN pg.importePagado = pg.importeMensual THEN FALSE " +
             " ELSE FALSE END AS validaPago,  " +
             " pg.importePagado , pg.importeMensual , " +
-            " pg.fechaParcialidad , " +
+            " pg.fechaParcialidad as fechaParcialidadSinFormato , " +
             " CASE WHEN pg.idEstatus = 2 THEN 0 WHEN MONTH(pg.fechaParcialidad) = MONTH(CURDATE()) && ((pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora) > 0  "
             +
             " THEN (pg.importeFaltante + pg.importeMensual) - pg.importePagadoBitacora " +
             " when pg.importeMensual - pg.importePagado  > 0 " +
             " then  pg.importeMensual - pg.importePagado " +
-            " ELSE pg.importeMensual END AS importeAcumulado, pg.folioRecibo " +
+            " ELSE pg.importeMensual END AS importeAcumulado, pg.folioRecibo, " +
+            " ( SELECT GROUP_CONCAT(sm.DES_METODO_PAGO) " +
+            " FROM SVC_BITACORA_PAGO_ANTICIPADO bp" +
+            " INNER JOIN SVC_METODO_PAGO sm ON bp.ID_METODO_PAGO = sm.ID_METODO_PAGO" +
+            " WHERE bp.IND_ACTIVO = 1 AND bp.ID_PAGO_SFPA = pg.idPagoSFPA) AS metodoPago " +
             " FROM ( " +
             " SELECT ps.ID_PAGO_SFPA AS idPagoSFPA, ps.ID_PLAN_SFPA AS idPlanSFPA,ps.ID_ESTATUS_PAGO AS idEstatus, v.DES_VELATORIO AS velatorio, ps.FEC_PARCIALIDAD AS fechaParcialidad, ps.IMP_MONTO_MENSUAL AS importeMensual, ep.DES_ESTATUS_PAGO_ANTICIPADO AS estatusPago, ( "
             +
@@ -186,7 +192,8 @@ public interface PlanSFPAMapper {
             " FROM SVT_PAGO_SFPA sps" +
             " WHERE sps.ID_ESTATUS_PAGO = 2 AND sps.IND_ACTIVO = 1 AND sps.FEC_PARCIALIDAD <= CURDATE() AND sps.ID_PLAN_SFPA = ps.ID_PLAN_SFPA) AS importeFaltante, ( "
             +
-            " SELECT IFNULL(SUM(bpaa.IMP_PAGO),0)  + IFNULL(SUM(bpaa.IMP_AUTORIZADO_VALE_PARITARIO),0) " +
+            " SELECT IFNULL(SUM(bpaa.IMP_PAGO),0)  + IFNULL(SUM(bpaa.IMP_AUTORIZADO_VALE_PARITARIO),0) "
+            +
             " FROM SVT_PAGO_SFPA sps" +
             " JOIN SVC_BITACORA_PAGO_ANTICIPADO bpaa ON bpaa.ID_PAGO_SFPA= sps.ID_PAGO_SFPA " +
             " AND bpaa.IND_ACTIVO = 1  " +
