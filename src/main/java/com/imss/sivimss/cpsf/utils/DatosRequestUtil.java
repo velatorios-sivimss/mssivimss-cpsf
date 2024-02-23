@@ -35,6 +35,14 @@ public class DatosRequestUtil {
 		return "";
 	}
 	
+	public static String condicionContratante (Integer idContratante) {
+		StringBuilder where = new StringBuilder();
+		where.append(" AND SC.ID_CONTRATANTE = ").append(idContratante);
+		where.append(" ORDER BY SP.ID_PERSONA DESC LIMIT 1");
+		
+		return where.toString();
+	}
+	
 	public static String condicion (Contratante contratanteRequest) {
 		StringBuilder where = new StringBuilder();
 		if(contratanteRequest.getCurp() != null && !contratanteRequest.getCurp().isEmpty()) {
@@ -50,7 +58,6 @@ public class DatosRequestUtil {
 		
 		return where.toString();
 	}
-	
 	public static  PlanSFPAResponse generarDetallePlan(DetallePlanSFPAResponse detallePlanSFPA, List<PagoSFPAResponse> pagoSFPA) throws SQLException {
 		PlanSFPAResponse planSFPAResponse = new PlanSFPAResponse();
 		List<Contratante> titularesBeneficiarios = new ArrayList<>(); 

@@ -288,7 +288,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			persona.setIdUsuario(user.getIdUsuario());
 			persona.getCp().setIdUsuario(user.getIdUsuario());
 			if(persona.getPersona().equalsIgnoreCase(AppConstantes.TITULAR)) {
-				PersonaResponse personaTemp = planSFPAMapper.selectExisteContratante(DatosRequestUtil.condicion(persona));
+				PersonaResponse personaTemp = planSFPAMapper.selectExisteContratante(DatosRequestUtil.condicionContratante(user.getIdContratante()));
 				if(personaTemp != null && personaTemp.getIdPersona() != null) {
 					persona.setIdPersona(personaTemp.getIdPersona());
 					persona.setTipoPersona(persona.getPersona()+" onlineA");
