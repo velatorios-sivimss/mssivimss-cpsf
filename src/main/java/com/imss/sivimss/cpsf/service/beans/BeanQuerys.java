@@ -357,4 +357,11 @@ public class BeanQuerys {
 		return consulta;
 	}
 	
+	public String consultaPagoMensual() {
+		String consulta="SELECT ID_TIPO_PAGO_MENSUAL AS value, DES_TIPO_PAGO_MENSUAL AS label\r\n"
+				+ "FROM SVC_TIPO_PAGO_MENSUAL\r\n"
+				+ "WHERE IND_ACTIVO =1";
+		log.info(consulta);
+		return consulta;
+	}
 }

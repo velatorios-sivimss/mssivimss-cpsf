@@ -519,5 +519,22 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
 	}
+	
+	
+	@Override
+	public Response<Object> consultaPagoMensualPlanSfpa()
+			throws IOException, SQLException {
+		
+		List<Map<String, Object>> result = new ArrayList<>();
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
+		try(SqlSession session = sqlSessionFactory.openSession()) {
+			Consultas consultas = session.getMapper(Consultas.class);
+			result = consultas.selectNativeQuery(query.consultaPagoMensual());
+		}
+		
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
+	}
+	
 
 }
