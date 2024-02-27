@@ -77,6 +77,12 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 	private Gson gson = new Gson();
 	
 	private UsuarioDto usuario;
+	
+	@Value("${pago.client-app-code}")
+	private String code;
+	
+	@Value("${pago.client-app-key}")
+	private String key;
 
 	@Override
 	public Response<Object> consultaDetallePlanSfpa(String cveUsuario) {
@@ -533,6 +539,16 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 			result = consultas.selectNativeQuery(query.consultaPagoMensual());
 		}
 		
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
+	}
+
+	@Override
+	public Response<Object> consultaPagoApi() throws IOException, SQLException {
+		List<Map<String, String>> result = new ArrayList<>();
+		Map<String, String>parametros= new HashMap<>();
+		parametros.put("code", code);
+		parametros.put("key", key);
+		result.add(parametros);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
 	}
 	

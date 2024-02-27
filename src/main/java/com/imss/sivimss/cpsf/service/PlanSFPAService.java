@@ -38,5 +38,7 @@ public interface PlanSFPAService {
 	Response<Object>  consultaDetallePlanSfpaContratante(Integer idVelatorio, Authentication authentication) throws IOException, SQLException;
 	
 	Response<Object>  consultaPagoMensualPlanSfpa() throws IOException, SQLException;
+	
+	Response<Object>  consultaPagoApi() throws IOException, SQLException;
 
 }
