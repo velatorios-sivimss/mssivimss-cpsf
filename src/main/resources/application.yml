@@ -62,6 +62,10 @@ endpoints:
 reporte:
     anexo-convenio-pago-anticipado:  ${msit_ANEXO_CONVENIO_PAGO_ANTICIPADO}
     comprobante-pago: reportes/plantilla/Comp_Pago_Linea.jrxml
+    
+pago:
+  client-app-code: 'VCM-FIBESOIMSS-STG-MXN-CLIENT'  
+  client-app-key: '3zLfJvt653sSiLdcW9RMdS05yLCOHH'
 
 jwt:
   login: ${msit_SECRET_KEY_LOGIN}
