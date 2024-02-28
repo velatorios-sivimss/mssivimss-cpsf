@@ -66,6 +66,7 @@ reporte:
 pago:
   client-app-code: 'VCM-FIBESOIMSS-STG-MXN-CLIENT'  
   client-app-key: '3zLfJvt653sSiLdcW9RMdS05yLCOHH'
+  env-mode: 'stg'
 
 jwt:
   login: ${msit_SECRET_KEY_LOGIN}
