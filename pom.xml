@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.imss</groupId>
-	<artifactId>mssivimss-arquetipo</artifactId>
+	<artifactId>mssivimss-cpsf</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mssivimss-cpsf</name>
 	<description>Ms Cpsf</description>

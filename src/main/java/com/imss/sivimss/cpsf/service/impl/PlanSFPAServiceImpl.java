@@ -279,7 +279,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 				 
 			
 			} catch (Exception e) {
-				e.printStackTrace();
+			
 				session.rollback();
 				session.close();
 			}finally {
