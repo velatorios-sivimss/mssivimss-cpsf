@@ -84,6 +84,9 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 	@Value("${pago.client-app-key}")
 	private String key;
 
+	@Value("${pago.env-mode}")
+	private String mode;
+
 	@Override
 	public Response<Object> consultaDetallePlanSfpa(String cveUsuario) {
 		List<Map<String, Object>> result = new ArrayList<>();
@@ -548,6 +551,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 		Map<String, String>parametros= new HashMap<>();
 		parametros.put("code", code);
 		parametros.put("key", key);
+		parametros.put("mode", mode);
 		result.add(parametros);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
 	}
