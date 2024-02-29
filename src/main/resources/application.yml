@@ -51,6 +51,7 @@ logging:
     root: info
     org.springframework.web: info
     org.hibernate: error
+    com.imss.sivimss.ods.prefune.on.configuration.mapper: INFO
 
 
 endpoints:
