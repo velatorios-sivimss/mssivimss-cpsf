@@ -39,7 +39,7 @@ public interface PlanSFPAMapper {
 	
 	@Update(value = "UPDATE SVC_PERSONA SET CVE_RFC = #{persona.rfc}, CVE_CURP=#{persona.curp},  CVE_NSS=#{persona.nss}, NOM_PERSONA = #{persona.nomPersona}, NOM_PRIMER_APELLIDO = #{persona.primerApellido}, "
 			+ " NOM_SEGUNDO_APELLIDO = #{persona.segundoApellido}, NUM_SEXO = #{persona.sexo}, REF_OTRO_SEXO = #{persona.otroSexo}, FEC_NAC = #{persona.fecNacimiento}, ID_PAIS=#{persona.idPais}, ID_ESTADO=#{persona.idEstado},"
-			+ " REF_TELEFONO=#{persona.telefono}, REF_TELEFONO_FIJO=#{persona.telefonoFijo}, REF_CORREO=#{persona.correo}, TIP_PERSONA=#{persona.tipoPersona}, NUM_INE=#{persona.ine}, FEC_ACTUALIZACION=CURRENT_DATE(),"
+			+ " REF_TELEFONO=#{persona.telefono}, REF_TELEFONO_FIJO=#{persona.telefonoFijo}, REF_CORREO=#{persona.correo}, TIP_PERSONA=#{persona.tipoPersona}, NUM_INE=#{persona.ine}, FEC_ACTUALIZACION=CURRENT_TIMESTAMP(),"
 			+ " ID_USUARIO_MODIFICA=#{persona.idUsuario}  WHERE ID_PERSONA = #{persona.idPersona}")
 	public int actualizarPersona(@Param("persona")Contratante persona);
 	
@@ -49,7 +49,7 @@ public interface PlanSFPAMapper {
 	public int insertarDomicilio(@Param("domicilio")Domicilio domicilio);
 	
 	@Update(value = "UPDATE SVT_DOMICILIO SET REF_CALLE = #{domicilio.desCalle}, NUM_EXTERIOR=#{domicilio.numExterior},  NUM_INTERIOR=#{domicilio.numInterior}, REF_CP = #{domicilio.codigoPostal}, "
-			+ " REF_COLONIA = #{domicilio.desColonia}, REF_MUNICIPIO = #{domicilio.desMunicipio}, REF_ESTADO = #{domicilio.desEstado}, FEC_ACTUALIZACION=CURRENT_DATE(), ID_USUARIO_MODIFICA=#{domicilio.idUsuario} "
+			+ " REF_COLONIA = #{domicilio.desColonia}, REF_MUNICIPIO = #{domicilio.desMunicipio}, REF_ESTADO = #{domicilio.desEstado}, FEC_ACTUALIZACION=CURRENT_TIMESTAMP(), ID_USUARIO_MODIFICA=#{domicilio.idUsuario} "
 			+ " WHERE ID_DOMICILIO = #{domicilio.idDomicilio}")
 	public int actualizarDomicilio(@Param("domicilio")Domicilio domicilio);
 	
@@ -59,7 +59,7 @@ public interface PlanSFPAMapper {
 	public int insertarContratante(@Param("contratante")Contratante Contratante);
 	
 	@Update(value = "UPDATE SVC_CONTRATANTE SET ID_PERSONA = #{contratante.idPersona}, CVE_MATRICULA=#{contratante.matricula}, ID_DOMICILIO = #{contratante.cp.idDomicilio}, "
-			+ "  FEC_ACTUALIZACION=CURRENT_DATE(), ID_USUARIO_MODIFICA=#{contratante.idUsuario} WHERE ID_CONTRATANTE = #{contratante.idContratante}")
+			+ "  FEC_ACTUALIZACION=CURRENT_TIMESTAMP(), ID_USUARIO_MODIFICA=#{contratante.idUsuario} WHERE ID_CONTRATANTE = #{contratante.idContratante}")
 	public int actualizarContratante(@Param("contratante")Contratante Contratante);
 	
 	@Insert(value = "INSERT INTO SVT_TITULAR_BENEFICIARIOS (ID_PERSONA, CVE_MATRICULA, REF_PERSONA, ID_DOMICILIO, ID_USUARIO_ALTA) "
@@ -78,7 +78,7 @@ public interface PlanSFPAMapper {
 	public int insertarTitularBeneficiario2(@Param("titularBeneficiarios")Contratante Contratante);
 	
 	@Update(value = "UPDATE SVT_TITULAR_BENEFICIARIOS SET ID_PERSONA = #{titularBeneficiarios.idPersona}, CVE_MATRICULA=#{titularBeneficiarios.matricula},  REF_PERSONA=#{titularBeneficiarios.persona}, "
-			+ " ID_DOMICILIO = #{titularBeneficiarios.cp.idDomicilio}, FEC_ACTUALIZACION=CURRENT_DATE(), ID_USUARIO_MODIFICA=#{titularBeneficiarios.idUsuario} WHERE ID_TITULAR_BENEFICIARIOS = #{titularBeneficiarios.idTitularBeneficiarios}")
+			+ " ID_DOMICILIO = #{titularBeneficiarios.cp.idDomicilio}, FEC_ACTUALIZACION=CURRENT_TIMESTAMP(), ID_USUARIO_MODIFICA=#{titularBeneficiarios.idUsuario} WHERE ID_TITULAR_BENEFICIARIOS = #{titularBeneficiarios.idTitularBeneficiarios}")
 	public int actualizarTitularBeneficiarios(@Param("titularBeneficiarios")Contratante Contratante);
 	
 	@Insert(value = "INSERT INTO SVT_USUARIOS (ID_PERSONA, ID_OFICINA, ID_ROL, IND_ACTIVO, CVE_CONTRASENIA, CVE_USUARIO , IND_CONTRATANTE, ID_USUARIO_ALTA) "
