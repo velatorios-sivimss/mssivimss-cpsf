@@ -275,7 +275,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 					 respuestaMap.put("pagoMensual", pagoMensual);
 					 response.setDatos(respuestaMap);
 					response.setMensaje(planSFPARequest.getNumFolioPlanSfpa());
-				//	session.commit();
+					session.commit();
 				 
 			
 			} catch (Exception e) {
