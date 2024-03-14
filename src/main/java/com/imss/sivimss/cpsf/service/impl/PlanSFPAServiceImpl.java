@@ -440,6 +440,7 @@ public class PlanSFPAServiceImpl implements PlanSFPAService {
 
 	private Map<String, Object> generarMap( ReportePagoAnticipadoReponse contratoServicioInmediatoResponse ) {
 		Map<String, Object> envioDatos = new HashMap<>();
+		envioDatos.put("numFolioPlanSFPA", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNumFolioPlanSFPA()));
 		envioDatos.put("nombreTitular", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNombreTitular()));
 		envioDatos.put("nacionalidadTitular", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getNacionalidadTitular()));
 		envioDatos.put("rfcTitular", DatosRequestUtil.validarSiEsNull(contratoServicioInmediatoResponse.getRfcTitular()));
