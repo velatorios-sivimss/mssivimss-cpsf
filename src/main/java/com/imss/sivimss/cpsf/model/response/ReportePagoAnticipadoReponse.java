@@ -12,6 +12,7 @@ public class ReportePagoAnticipadoReponse {
 
 private String nombreTitular;
 //param
+private String numFolioPlanSFPA;
 private String fecNacTitular;
 private String nacionalidadTitular;
 private String rfcTitular;
