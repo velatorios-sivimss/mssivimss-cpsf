@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.imss.sivimss.cpsf.configuration.MyBatisConfig;
 import com.imss.sivimss.cpsf.configuration.mapper.BitacoraPAMapper;
+import com.imss.sivimss.cpsf.configuration.mapper.Consultas;
 import com.imss.sivimss.cpsf.configuration.mapper.ConvenioPFMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.PagoBitacoraMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.PagoDetalleMapper;
@@ -29,11 +30,13 @@ import com.imss.sivimss.cpsf.utils.AppConstantes;
 import com.imss.sivimss.cpsf.utils.LogUtil;
 import com.imss.sivimss.cpsf.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.cpsf.utils.Response;
+import com.imss.sivimss.cpsf.utils.SQLLoader;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ComPagoResponse;
 import com.imss.sivimss.cpsf.model.response.ConPFResponse;
 import com.imss.sivimss.cpsf.model.response.CostoResponse;
 import com.imss.sivimss.cpsf.model.response.RenConPFResponse;
+import com.imss.sivimss.cpsf.model.entity.Bitacora;
 import com.imss.sivimss.cpsf.model.request.PagoBitacoraRequest;
 import com.imss.sivimss.cpsf.model.request.PagoDetalleRequest;
 
@@ -58,6 +61,9 @@ public class PagoServiceImpl implements PagoService {
 	@Value("${formato_fecha_hora}")
 	private String formatoFechaHora;
 	
+	@Autowired
+    private SQLLoader sqlLoader;
+	
 	private static final String ERROR_INFORMACION = "52";
 	private static final String EXITO = "Exito";
 	private static final Integer ESTATUS_PAGADO = 4;
@@ -73,7 +79,7 @@ public class PagoServiceImpl implements PagoService {
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		String impresion;
-		try (SqlSession session = sqlSessionFactory.openSession();) {
+		try (SqlSession session = sqlSessionFactory.openSession()) {
 
 			pago.setIdUsuario(usuarioDto.getIdUsuario());
 			pago.setIdPlataforma(PLATAFORMA_LINEA);
@@ -112,7 +118,12 @@ public class PagoServiceImpl implements PagoService {
 				 * configuration.addMapper(NombreDeMiMapper.class);)
 				 */
 				PagoLineaMapper pagoLineaMapper = session.getMapper(PagoLineaMapper.class);
+				Consultas consultas = session.getMapper(Consultas.class);
 				pagoLineaMapper.nuevoRegistroObj(pago);
+			
+				String queryBitacora = sqlLoader.getBitacoraNuevoRegistro();
+                consultas.insertData(queryBitacora, new Bitacora(1, "SVT_PAGO_LINEA", null, gson.toJson(pago), usuarioDto.getIdUsuario()));
+	
 				session.commit();
 
 			} catch (Exception e) {

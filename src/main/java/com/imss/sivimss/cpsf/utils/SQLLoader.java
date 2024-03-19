@@ -1,0 +1,36 @@
+package com.imss.sivimss.cpsf.utils;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
+
+import lombok.Data;
+
+@Component
+@Data
+public class SQLLoader {
+
+    private final ResourceLoader resourceLoader;
+
+    private String bitacoraNuevoRegistro;
+
+    public SQLLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    @PostConstruct
+    public void init() throws IOException {
+    	
+        Resource resource = resourceLoader.getResource("classpath:sql/BITACORA_CREAR_REGISTRO.SQL");
+        byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
+        bitacoraNuevoRegistro = new String(bytes, StandardCharsets.UTF_8);
+
+    }
+
+}
