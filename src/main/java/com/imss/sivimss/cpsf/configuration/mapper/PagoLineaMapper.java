@@ -33,13 +33,13 @@ public interface PagoLineaMapper {
 			+ "ID_CLIENTE_LINEA, CVE_REFERENCIA, NUM_APROBACION, "
 			+ "CVE_FOLIO_PAGO, NUM_TARJETA, REF_EMISOR, "
 			+ "STP_TRANSACCION, IMP_VALOR, ID_ESTATUS_PAGO, "
-			+ "ID_USUARIO_ALTA, FEC_ALTA, CVE_FOLIO_REGISTRO) "
+			+ "ID_USUARIO_ALTA, FEC_ALTA, CVE_FOLIO_REGISTRO,REF_PAGO) "
 			+ "VALUES ("
 			+ " #{out.idRegistro}, #{out.idFlujoPagos}, #{out.idVelatorio},"
 			+ "#{out.idCliente}, #{out.referencia}, #{out.numAprobacion}, "
 			+ "#{out.folioPago}, #{out.numTarjeta}, #{out.emisorTarjeta}, "
 			+ "#{out.fecTransaccion}, #{out.importe}, 4, "
-			+ "#{out.idUsuario}, NOW(), #{out.folio})")
+			+ "#{out.idUsuario}, NOW(), #{out.folio},#{out.refPago})")
 	@Options(useGeneratedKeys = true,keyProperty = "out.idPagoLinea", keyColumn="id")
 	public int nuevoRegistroObj(@Param("out")PagoRequest pago);
 	
@@ -48,7 +48,7 @@ public interface PagoLineaMapper {
 			+ "US.CVE_USUARIO AS claveCliente,\r\n"
 			+ "CONCAT(PER.NOM_PERSONA, ' ', PER.NOM_PRIMER_APELLIDO, ' ', PER.NOM_SEGUNDO_APELLIDO) AS nomUsuario,\r\n"
 			+ "PL.CVE_FOLIO_REGISTRO AS numCon,\r\n"
-			+ "FP.DESC_FLUJO_PAGOS AS conPago,\r\n"
+			+ "PL.REF_PAGO AS conPago,\r\n"
 			+ "PL.IMP_VALOR AS impPagado,\r\n"
 			+ "PL.CVE_REFERENCIA AS referencia,\r\n"
 			+ "PL.NUM_APROBACION AS numAprobacion,\r\n"

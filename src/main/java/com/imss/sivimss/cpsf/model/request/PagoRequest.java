@@ -57,5 +57,7 @@ public class PagoRequest {
 	private Integer idPagoSFPA;
 	
 	private Integer idPlataforma;
+
+	private String refPago;
 	
 }
