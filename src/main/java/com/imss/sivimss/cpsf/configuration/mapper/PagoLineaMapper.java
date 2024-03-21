@@ -32,13 +32,13 @@ public interface PagoLineaMapper {
 			+ "ID_REGISTRO, ID_FLUJO_PAGOS, ID_VELATORIO,"
 			+ "ID_CLIENTE_LINEA, CVE_REFERENCIA, NUM_APROBACION, "
 			+ "CVE_FOLIO_PAGO, NUM_TARJETA, REF_EMISOR, "
-			+ "STP_TRANSACCION, IMP_VALOR, ID_ESTATUS_PAGO, "
+			+ "IMP_VALOR, ID_ESTATUS_PAGO, "
 			+ "ID_USUARIO_ALTA, FEC_ALTA, CVE_FOLIO_REGISTRO,REF_PAGO) "
 			+ "VALUES ("
 			+ " #{out.idRegistro}, #{out.idFlujoPagos}, #{out.idVelatorio},"
 			+ "#{out.idCliente}, #{out.referencia}, #{out.numAprobacion}, "
 			+ "#{out.folioPago}, #{out.numTarjeta}, #{out.emisorTarjeta}, "
-			+ "#{out.fecTransaccion}, #{out.importe}, 4, "
+			+ "#{out.importe}, 4, "
 			+ "#{out.idUsuario}, NOW(), #{out.folio},#{out.refPago})")
 	@Options(useGeneratedKeys = true,keyProperty = "out.idPagoLinea", keyColumn="id")
 	public int nuevoRegistroObj(@Param("out")PagoRequest pago);
