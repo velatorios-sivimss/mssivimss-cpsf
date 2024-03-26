@@ -314,6 +314,7 @@ public class PagoServiceImpl implements PagoService {
 				renConvenioPFMapper.actualizarRegistroObj(pago.getIdRegistro(), pago.getIdUsuario());
 				session.commit();
 
+				response = new Response<>(false, 200, EXITO, pago);
 			} catch (Exception e) {
 				/*
 				 * Para el escenario en que fallen las querys
