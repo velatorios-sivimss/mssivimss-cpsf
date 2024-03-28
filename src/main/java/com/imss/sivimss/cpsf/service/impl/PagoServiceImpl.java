@@ -377,7 +377,8 @@ public class PagoServiceImpl implements PagoService {
 						authentication);
 
 				pagoSFPAMapper.actualizaEstatusPagoSFPA(pago, estatusPagoSFPA);
-
+				session.commit();
+				
 				Double total = validaTotalPagado(pago.getIdRegistro(), authentication);
 
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
