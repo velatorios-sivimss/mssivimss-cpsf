@@ -384,9 +384,10 @@ public class PagoServiceImpl implements PagoService {
 						this.getClass().getPackage().toString(), "", "El total es: " + total, authentication);
 
 				Integer estatusPlan = 2;// esatus plan 2 vigente
-				if (total <= 0.0)
+				if (total <= 0){
 					estatusPlan = 4;// esatus plan 4 pagado
-
+				}
+				
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 						this.getClass().getPackage().toString(), "", "Total pagado: " + total, authentication);
 
