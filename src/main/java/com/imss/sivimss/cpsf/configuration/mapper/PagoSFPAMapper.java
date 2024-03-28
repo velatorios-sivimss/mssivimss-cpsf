@@ -70,7 +70,7 @@ public interface PagoSFPAMapper {
 	
 	@Update(value = ""
 			+ "UPDATE SVT_PAGO_SFPA SET ID_USUARIO_MODIFICA = #{idUsuario},\r\n"
-			+ "FEC_ACTUALIZACION = NOW(),\r\n"
+			+ "FEC_ACTUALIZACION = NOW(), estatusPagoSFPA=#{estatusPagoSFPA} "
 			+ "REF_FOLIO_RECIBO = (\r\n"
 			+ "SELECT\r\n"
 			+ "LPAD(\r\n"
@@ -87,7 +87,8 @@ public interface PagoSFPAMapper {
 	public int actualizarFolioPago( 
 			@Param("idUsuario")Integer idUsuario, 
 			@Param("idPagoSFPA")Integer idPagoSFPA, 
-			@Param("idPlanSFPA")Integer idPlanSFPA);
+			@Param("idPlanSFPA")Integer idPlanSFPA,
+			@Param("estatusPagoSFPA")Integer estatusPagoSFPA);
 	
 	@Update(value = ""
 			+ "UPDATE \r\n"
