@@ -115,14 +115,13 @@ public interface PagoSFPAMapper {
 	public Double totalPagado(Integer idPlan);
 	
 	@Update(value = ""
-			+ "UPDATE \r\n"
-			+ "SVT_PLAN_SFPA \r\n"
-			+ "SET ID_ESTATUS_PLAN_SFPA = #{idEstatusPlan},\r\n"
-			+ "ID_USUARIO_MODIFICA = #{out.idUsuario},\r\n"
-			+ "FEC_ACTUALIZACION = NOW()\r\n"
-			+ "WHERE \r\n"
+			+ "UPDATE "
+			+ "SVT_PLAN_SFPA   "
+			+ "SET ID_ESTATUS_PLAN_SFPA = #{idEstatusPlan},  "
+			+ "ID_USUARIO_MODIFICA = #{out.idUsuario},  "
+			+ "FEC_ACTUALIZACION = NOW()  "
+			+ "WHERE   "
 			+ "ID_PLAN_SFPA = #{out.idRegistro}"
 			)
-	public int actualizaEstatusPlan( @Param("out")PagoRequest pago, 
-			@Param("idEstatusPlan")Integer idEstatusPlan);
+	public int actualizaEstatusPlan( @Param("out")PagoRequest pago, @Param("idEstatusPlan")Integer idEstatusPlan);
 }
