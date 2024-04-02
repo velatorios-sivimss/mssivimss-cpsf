@@ -1,6 +1,10 @@
 package com.imss.sivimss.cpsf.service.impl;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,21 +28,22 @@ import com.imss.sivimss.cpsf.configuration.mapper.PagoDetalleMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.PagoLineaMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.PagoSFPAMapper;
 import com.imss.sivimss.cpsf.configuration.mapper.RenConvenioPFMapper;
+import com.imss.sivimss.cpsf.model.entity.Bitacora;
+import com.imss.sivimss.cpsf.model.request.PagoBitacoraRequest;
+import com.imss.sivimss.cpsf.model.request.PagoDetalleRequest;
 import com.imss.sivimss.cpsf.model.request.PagoRequest;
-import com.imss.sivimss.cpsf.service.PagoService;
-import com.imss.sivimss.cpsf.utils.AppConstantes;
-import com.imss.sivimss.cpsf.utils.LogUtil;
-import com.imss.sivimss.cpsf.utils.ProviderServiceRestTemplate;
-import com.imss.sivimss.cpsf.utils.Response;
-import com.imss.sivimss.cpsf.utils.SQLLoader;
 import com.imss.sivimss.cpsf.model.request.UsuarioDto;
 import com.imss.sivimss.cpsf.model.response.ComPagoResponse;
 import com.imss.sivimss.cpsf.model.response.ConPFResponse;
 import com.imss.sivimss.cpsf.model.response.CostoResponse;
 import com.imss.sivimss.cpsf.model.response.RenConPFResponse;
-import com.imss.sivimss.cpsf.model.entity.Bitacora;
-import com.imss.sivimss.cpsf.model.request.PagoBitacoraRequest;
-import com.imss.sivimss.cpsf.model.request.PagoDetalleRequest;
+import com.imss.sivimss.cpsf.service.PagoService;
+import com.imss.sivimss.cpsf.utils.AppConstantes;
+import com.imss.sivimss.cpsf.utils.GeneraCredencialesUtil;
+import com.imss.sivimss.cpsf.utils.LogUtil;
+import com.imss.sivimss.cpsf.utils.ProviderServiceRestTemplate;
+import com.imss.sivimss.cpsf.utils.Response;
+import com.imss.sivimss.cpsf.utils.SQLLoader;
 
 @Service
 public class PagoServiceImpl implements PagoService {
@@ -70,6 +75,9 @@ public class PagoServiceImpl implements PagoService {
 	private static final Integer PLATAFORMA_LINEA = 2;
 	private static final String TAR_CREDITO = "TARJETA DE CRÉDITO";
 	private static final String TAR_DEBITO = "TARJETA DE DÉBITO";
+	
+	@Autowired
+	private GeneraCredencialesUtil generaCredencialesUtil;
 	
 	@Override
 	public Response<Object> crear(PagoRequest pago, Authentication authentication) throws IOException {	
@@ -244,6 +252,8 @@ public class PagoServiceImpl implements PagoService {
 		Response<Object> response = null;
 		ConPFResponse conPF;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		Gson gson= new Gson();
+		UsuarioDto usuarioDto=gson.fromJson(((String)authentication.getPrincipal()), UsuarioDto.class);
 		
 
 		try (SqlSession session = sqlSessionFactory.openSession();) {
@@ -263,7 +273,18 @@ public class PagoServiceImpl implements PagoService {
 				pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
 				pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
 				convenioPFMapper.actualizarRegistroObj(pago.getIdRegistro(), pago.getIdUsuario());
+				String correo=convenioPFMapper.correoUsuario(usuarioDto.getIdUsuario());
 				session.commit();
+
+				if (correo!=null) {
+					Integer respuesta= !correo.equalsIgnoreCase("")? 
+					enviarCorreo(
+						pago.getNomTitular(),pago.getFolio(), pago.getImporte(), 
+						pago.getNumTarjeta(), pago.getReferencia(), 
+						pago.getFolioPago(), pago.getFecTransaccion(), 
+						pago.getEmisorTarjeta(),correo, pago.getRefPago()):0;
+				}
+				
 				response = new Response<>(false, 200, EXITO, pago);
 
 			} catch (Exception e) {
@@ -294,7 +315,8 @@ public class PagoServiceImpl implements PagoService {
 		Response<Object> response = null;
 		RenConPFResponse renConPF;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		
+		Gson gson= new Gson();
+		UsuarioDto usuarioDto=gson.fromJson(((String)authentication.getPrincipal()), UsuarioDto.class);
 		try (SqlSession session = sqlSessionFactory.openSession();) {
 			try {
 
@@ -312,8 +334,16 @@ public class PagoServiceImpl implements PagoService {
 				pagoDetalle.setIdPagoBitacora(pagoBitacora.getIdPagoBitacora());
 				pagoDetalleMapper.nuevoRegistroObj(pagoDetalle);
 				renConvenioPFMapper.actualizarRegistroObj(pago.getIdRegistro(), pago.getIdUsuario());
+				String correo=renConvenioPFMapper.correoUsuario(usuarioDto.getIdUsuario());
 				session.commit();
-
+				if (correo!=null) {
+					Integer respuesta= !correo.equalsIgnoreCase("")? 
+					enviarCorreo(
+						pago.getNomTitular(),pago.getFolio(), pago.getImporte(), 
+						pago.getNumTarjeta(), pago.getReferencia(), 
+						pago.getFolioPago(), pago.getFecTransaccion(), 
+						pago.getEmisorTarjeta(),correo, pago.getRefPago()):0;
+				}
 				response = new Response<>(false, 200, EXITO, pago);
 			} catch (Exception e) {
 				/*
@@ -340,7 +370,8 @@ public class PagoServiceImpl implements PagoService {
 		
 		Response<Object> response = null;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		
+		Gson gson= new Gson();
+		UsuarioDto usuarioDto=gson.fromJson(((String)authentication.getPrincipal()), UsuarioDto.class);
 		
 		try (SqlSession session = sqlSessionFactory.openSession();) {
 			try {
@@ -375,7 +406,6 @@ public class PagoServiceImpl implements PagoService {
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 						this.getClass().getPackage().toString(), "", "el estatus de pago es " + estatusPagoSFPA,
 						authentication);
-
 				pagoSFPAMapper.actualizaEstatusPagoSFPA(pago, estatusPagoSFPA);
 				session.commit();
 				
@@ -396,8 +426,18 @@ public class PagoServiceImpl implements PagoService {
 						this.getClass().getPackage().toString(), "", "Estatus Plan: " + estatusPlan, authentication);
 
 				pagoSFPAMapper.actualizaEstatusPlan(pago, estatusPlan);
+				String correo=pagoSFPAMapper.correoUsuario(usuarioDto.getIdUsuario());
 				session.commit();
-
+			
+				if (correo!=null) {
+					Integer respuesta= !correo.equalsIgnoreCase("")? 
+					enviarCorreo(
+						pago.getNomTitular(),pago.getFolio(), pago.getImporte(), 
+						pago.getNumTarjeta(), pago.getReferencia(), 
+						pago.getFolioPago(), pago.getFecTransaccion(), 
+						pago.getEmisorTarjeta(), correo, pago.getRefPago()):0;
+				}
+               
 				response = new Response<>(false, 200, EXITO, pago);
 
 			} catch (Exception e) {
@@ -566,5 +606,25 @@ public class PagoServiceImpl implements PagoService {
         return total;
 
     }
+	
+	private Integer enviarCorreo(String nombre,String folio,
+			Double importe,String numTarjeta, String referencia,String folioPago,
+			String fechaPago, String emisorTarjeta, String correo, String referenciaPago) {
+		try {
+			DecimalFormat formateador = new DecimalFormat("####.##");
+			importe=Double.valueOf(formateador.format(importe));
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss ");
+
+			generaCredencialesUtil.enviarCorreoPago(nombre, 
+					folio, 
+					importe, 
+					numTarjeta, 
+					referencia, folioPago,LocalDateTime.parse(fechaPago).format(formatter),emisorTarjeta,correo,referenciaPago);
+			return 1;
+		} catch (IOException e) {
+			return null;
+			
+		}
+	}
 
 }
