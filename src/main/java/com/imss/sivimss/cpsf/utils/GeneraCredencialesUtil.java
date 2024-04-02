@@ -100,6 +100,28 @@ public class GeneraCredencialesUtil{
 		return response;
 	}
 	
-	
+	public Response<Object> enviarCorreoPago(String nombre,String folio,Double importe,String numTarjeta, String referencia,String folioPago,
+			String fechaPago, String emisorTarjeta, String correo, String referenciaPago) throws IOException {
+		log.info("envioCorreo " + urlEnvioCorreo);
+		String credenciales = 
+				"<b>Nombre completo del Usuario:</b> " + nombre
+				+ "<br> <b>Folio: </b>" + folio 
+				+ "<br> <b>Importe: </b>$ " + importe
+				+ "<br> <b>Número Tarjeta: </b>****-****-****-" + numTarjeta
+				+ "<br> <b>Referencia: </b> " + referencia
+				+ "<br> <b>Emisor Tarjeta: </b> " + emisorTarjeta
+				+ "<br> <b>Fecha Transacción: </b> " + fechaPago
+				+ "<br> <b>Referencia Pago: </b> " + referenciaPago;
+		CorreoRequest correoR = new CorreoRequest(nombre, credenciales, correo, AppConstantes.CORREO_PAGO_EN_LINEA);
+		// Hacemos el consumo para enviar el codigo por correo
+
+		Response<Object> response = providerRestTemplate.consumirServicio(correoR, urlEnvioCorreo);
+
+		if (response.getCodigo() != 200) {
+			return new Response<>(true, 500, "Error en el envio de correos", null);
+		}
+		return response;
+	}
+
 	
 }

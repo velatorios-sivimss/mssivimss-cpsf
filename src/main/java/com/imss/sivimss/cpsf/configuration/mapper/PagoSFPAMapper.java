@@ -124,4 +124,11 @@ public interface PagoSFPAMapper {
 			+ "ID_PLAN_SFPA = #{out.idRegistro}"
 			)
 	public int actualizaEstatusPlan( @Param("out")PagoRequest pago, @Param("idEstatusPlan")Integer idEstatusPlan);
+	
+	@Select("SELECT sp.REF_CORREO as correo\r\n"
+			+ "FROM SVT_USUARIOS su \r\n"
+			+ "inner join SVC_PERSONA sp on su.ID_PERSONA = sp.ID_PERSONA \r\n"
+			+ "WHERE su.ID_USUARIO = #{idUsuario}  "
+			)
+	public String correoUsuario(Integer idUsuario);
 }

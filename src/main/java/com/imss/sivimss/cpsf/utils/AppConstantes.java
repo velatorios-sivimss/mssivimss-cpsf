@@ -19,6 +19,7 @@ public class AppConstantes {
 	public static final String RUTA_NOMBRE_REPORTE = "rutaNombreReporte";
 	public static final String TIPO_REPORTE = "tipoReporte";
 	public static final String USR_CONTRASENIA= "registrarUsuario";
+	public static final String CORREO_PAGO_EN_LINEA= "pagoEnLinea";
 
 	public static final String FUNCIONALIDAD = "idFuncionalidad";
 	public static final String SERVICIO = "servicio";

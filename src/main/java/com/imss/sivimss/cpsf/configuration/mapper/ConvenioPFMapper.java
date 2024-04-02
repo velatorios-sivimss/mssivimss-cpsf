@@ -28,4 +28,11 @@ public interface ConvenioPFMapper {
 			+ "WHERE ID_CONVENIO_PF = #{idConvenioPF} \r\n"
 			)
 	public int actualizarRegistroObj(@Param("idConvenioPF")Integer idConvenioPF, @Param("idUsuario")Integer idUsuario);
+	
+	@Select("SELECT sp.REF_CORREO as correo\r\n"
+			+ "FROM SVT_USUARIOS su \r\n"
+			+ "inner join SVC_PERSONA sp on su.ID_PERSONA = sp.ID_PERSONA \r\n"
+			+ "WHERE su.ID_USUARIO = #{idUsuario}  "
+			)
+	public String correoUsuario(Integer idUsuario);
 }
